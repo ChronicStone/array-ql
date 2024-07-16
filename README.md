@@ -70,10 +70,8 @@ The main function to query your array data.
 - `key: string`: The property to filter on
 - `value: any`: The value to compare against
 - `matchMode: FilterMatchMode`: The type of comparison to make
-- `required?: boolean`: Whether this filter must match
-- `postCondition?: boolean`: Apply this filter after other operations
-- `arrayLookup?: Operator`: How to combine multiple matches in arrays
-- `lookupAtRoot?: boolean`: Whether to apply the filter at the root level
+- `operator?: Operator` (`'AND' | 'OR' | (() => 'AND' | 'OR')`): How to combine multiple matches in arrays
+- `params?: MatcherParams`: Additional parameters for the match mode
 
 ### FilterMatchMode
 

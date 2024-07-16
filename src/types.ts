@@ -13,11 +13,10 @@ export type FilterMatchMode =
   | 'lessThan'
   | 'lessThanOrEqual'
   | 'exists'
-  | 'objectStringMap'
   | 'arrayLength'
   | 'objectMatch'
 
-export type NonObjectMatchMode = Exclude<FilterMatchMode, 'objectStringMap' | 'objectMatch'>
+export type NonObjectMatchMode = Exclude<FilterMatchMode, 'objectMatch'>
 export type ComparatorMatchMode = Extract<FilterMatchMode, 'between' | 'greaterThan' | 'greaterThanOrEqual' | 'lessThan' | 'lessThanOrEqual'>
 
 export interface ComparatorParams {
@@ -28,23 +27,11 @@ export interface ObjectMapFilterParams {
   operator: 'AND' | 'OR'
   properties: Array<{
     key: string
-    matchMode: Exclude<FilterMatchMode, 'objectStringMap' | 'objectMap'>
+    matchMode: Exclude<FilterMatchMode, 'objectMap'>
   }>
   transformFilterValue?: (value: any) => any
   matchPropertyAtIndex?: boolean
-}
-
-export interface ObjectStringMapFilterParams {
-  stringMap: Array<
-    | string
-    | {
-      propertyName: string
-      matchMode: Exclude<FilterMatchMode, 'objectStringMap'>
-    }
-  >
-  stringMapSeparator?: string
-  stringMapOperator?: 'AND' | 'OR'
-  dateMode?: boolean
+  applyAtRoot?: boolean
 }
 
 export type MatchModeCore = ({
@@ -53,9 +40,6 @@ export type MatchModeCore = ({
   matchMode: ComparatorMatchMode
   params?: ComparatorParams
 } | {
-  matchMode: 'objectStringMap'
-  params: ObjectStringMapFilterParams
-} | {
   matchMode: 'objectMatch'
   params: ObjectMapFilterParams | ((value: any) => ObjectMapFilterParams)
 })
@@ -63,10 +47,7 @@ export type MatchModeCore = ({
 export type QueryFilter = {
   key: string
   value: any
-  required?: boolean | undefined
-  postCondition?: boolean
-  arrayLookup?: Operator
-  lookupAtRoot?: boolean
+  operator?: Operator
 } & MatchModeCore
 
 export interface QueryParams {
@@ -91,7 +72,6 @@ export interface MatchModeProcessorMap {
   lessThan: ({ value, filter }: { value: any, filter: any, params?: ComparatorParams }) => boolean
   lessThanOrEqual: ({ value, filter }: { value: any, filter: any, params?: ComparatorParams }) => boolean
   between: ({ value, filter }: { value: any, filter: any, params?: ComparatorParams }) => boolean
-  objectStringMap: (p: { value: any, filter: any }) => boolean
   arrayLength: ({ value, filter }: { value: any, filter: any }) => boolean
   objectMatch: ({ value, filter, params }: { value: any, filter: any, params: ObjectMapFilterParams, index?: number }) => boolean
 }

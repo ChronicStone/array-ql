@@ -35,12 +35,12 @@ export function query<T extends GenericObject, P extends QueryParams>(
     result = result.filter((item) => {
       return (params.filter ?? []).every((filter) => {
         const value = getObjectProperty(item, filter.key)
-        const arrayLookup = typeof filter.arrayLookup === 'function' ? filter.arrayLookup() : filter.arrayLookup ?? 'OR'
+        const operator = typeof filter.operator === 'function' ? filter.operator() : filter.operator ?? 'OR'
         if (filter.matchMode === 'equals') {
           return processFilterWithLookup({
             type: 'equals',
             params: null,
-            arrayLookup,
+            operator,
             value,
             filter: filter.value,
           })
@@ -50,7 +50,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
           return processFilterWithLookup({
             type: 'contains',
             params: null,
-            arrayLookup,
+            operator,
             value,
             filter: filter.value,
           })
@@ -59,7 +59,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
           return processFilterWithLookup({
             type: 'between',
             params: filter?.params ?? null,
-            arrayLookup,
+            operator,
             value,
             filter: filter.value,
           })
@@ -69,7 +69,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
           return processFilterWithLookup({
             type: 'greaterThan',
             params: filter?.params ?? null,
-            arrayLookup,
+            operator,
             value,
             filter: filter.value,
           })
@@ -79,7 +79,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
           return processFilterWithLookup({
             type: 'greaterThanOrEqual',
             params: filter?.params ?? null,
-            arrayLookup,
+            operator,
             value,
             filter: filter.value,
           })
@@ -89,7 +89,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
           return processFilterWithLookup({
             type: 'lessThan',
             params: filter?.params ?? null,
-            arrayLookup,
+            operator,
             value,
             filter: filter.value,
           })
@@ -99,7 +99,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
           return processFilterWithLookup({
             type: 'lessThanOrEqual',
             params: filter?.params ?? null,
-            arrayLookup,
+            operator,
             value,
             filter: filter.value,
           })
@@ -109,17 +109,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
           return processFilterWithLookup({
             type: 'exists',
             params: null,
-            arrayLookup,
-            value,
-            filter: filter.value,
-          })
-        }
-
-        if (filter.matchMode === 'objectStringMap') {
-          return processFilterWithLookup({
-            type: 'objectStringMap',
-            params: filter.params,
-            arrayLookup,
+            operator,
             value,
             filter: filter.value,
           })
@@ -129,7 +119,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
           return processFilterWithLookup({
             type: 'arrayLength',
             params: null,
-            arrayLookup,
+            operator,
             value,
             filter: filter.value,
           })
@@ -141,8 +131,8 @@ export function query<T extends GenericObject, P extends QueryParams>(
           return processFilterWithLookup({
             type: 'objectMatch',
             params,
-            arrayLookup,
-            value: filter.lookupAtRoot ? item : value,
+            operator,
+            value: params?.applyAtRoot ? item : value,
             filter: filterValue,
           })
         }
@@ -201,7 +191,7 @@ function processFilterWithLookup<
   P = Parameters<MatchModeProcessorMap[T]>[0],
 >(params: {
   type: FilterMatchMode
-  arrayLookup: 'AND' | 'OR'
+  operator: 'AND' | 'OR'
   value: any
   filter: any
   params: P extends { params: infer U } ? U : P extends { params?: infer U } ? U : null
@@ -219,7 +209,7 @@ function processFilterWithLookup<
       : MatchModeProcessor[params.type]({ params: params.params as any, value: params.value, filter: params.filter })
   }
 
-  else if (params.arrayLookup === 'AND') {
+  else if (params.operator === 'AND') {
     return Array.isArray(params.filter) && params.filter.every((filter, index) => {
       if (Array.isArray(params.value)) {
         return params.value.some(value =>
@@ -237,7 +227,7 @@ function processFilterWithLookup<
     })
   }
 
-  else if (params.arrayLookup === 'OR') {
+  else if (params.operator === 'OR') {
     return Array.isArray(params.filter) && params.filter.some((filter, index) =>
       Array.isArray(params.value)
         ? params.value.some(value =>

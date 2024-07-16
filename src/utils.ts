@@ -38,7 +38,6 @@ export const MatchModeProcessor: MatchModeProcessorMap = {
   between: ({ value, filter, params }) => {
     return params?.dateMode ? new Date(value) >= new Date(filter[0]) && new Date(value) <= new Date(filter[1]) : value >= filter[0] && value <= filter[1]
   },
-  objectStringMap: p => !!p,
   arrayLength: ({ value, filter }) => Array.isArray(value) && value.length === filter,
   objectMatch: ({ value, filter, params, index }) => {
     const properties = typeof index !== 'undefined' && params.matchPropertyAtIndex ? [params.properties[index]] : params.properties
