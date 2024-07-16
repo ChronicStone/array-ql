@@ -70,15 +70,16 @@ export type QueryFilter = {
 } & MatchModeCore
 
 export interface QueryParams {
-  page: number
-  limit: number
   sort?: { key: string, dir?: 'asc' | 'desc' }
   search?: {
     value: string
     keys: string[]
   }
   filter?: QueryFilter[]
+  limit?: number
+  offset?: number
 }
+export type QueryResult<T extends GenericObject, P extends QueryParams> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : { totalRows: number, totalPages: number, rows: T[] }
 
 export interface MatchModeProcessorMap {
   equals: ({ value, filter }: { value: any, filter: any }) => boolean

@@ -1,10 +1,10 @@
-import type { FilterMatchMode, GenericObject, MatchModeProcessorMap, QueryParams } from './types'
+import type { FilterMatchMode, GenericObject, MatchModeProcessorMap, QueryParams, QueryResult } from './types'
 import { MatchModeProcessor, getObjectProperty, validateBetweenPayload } from './utils'
 
-export function query<T extends GenericObject>(
+export function query<T extends GenericObject, P extends QueryParams>(
   data: T[],
-  params: QueryParams,
-) {
+  params: P,
+): QueryResult<T, P> {
   let result: T[] = [...data]
 
   if (params.search?.value) {
@@ -152,16 +152,24 @@ export function query<T extends GenericObject>(
     })
   }
 
-  const totalRows = result.length
-  const totalPages = Math.ceil(totalRows / params.limit)
-  const start = (params.page - 1) * params.limit
-  const end = start + params.limit
-  result = result.slice(start, end)
+  if (typeof params.limit === 'undefined') {
+    return { rows: result } as QueryResult<T, P>
+  }
 
-  return {
-    totalRows,
-    totalPages,
-    rows: result,
+  else {
+    const unpaginatedRows = [...result]
+    const totalRows = result.length
+    const totalPages = Math.ceil(totalRows / params.limit)
+    const start = params.offset ?? 0
+    const end = start + params.limit
+    result = result.slice(start, end)
+
+    return {
+      totalRows,
+      totalPages,
+      rows: result,
+      unpaginatedRows,
+    } as QueryResult<T, P>
   }
 }
 

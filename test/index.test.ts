@@ -8,7 +8,6 @@ describe('should filter users', () => {
   it('should filter active users', () => {
     const { totalPages, totalRows } = query(users, {
       limit: 10,
-      page: 1,
       sort: {
         key: 'createdAt',
         dir: 'desc',
