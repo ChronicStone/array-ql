@@ -55,6 +55,7 @@ export default defineConfig({
       {
         text: 'Features',
         items: [
+          { text: 'Type-Safe Queries', link: '/features/type-safety' },
           { text: 'Pagination', link: '/features/pagination' },
           { text: 'Sorting', link: '/features/sorting' },
           { text: 'Searching', link: '/features/searching' },

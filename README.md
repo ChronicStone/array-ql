@@ -1,6 +1,6 @@
 # 🔍 ArrayQuery
 
-ArrayQuery is a powerful TypeScript package that brings ORM-like querying capabilities to local arrays. It allows you to manipulate and retrieve data from arrays with ease, using a familiar and intuitive API.
+ArrayQuery is a powerful TypeScript package that brings type-safe querying capabilities to local arrays. It allows you to manipulate and retrieve data from arrays with ease, using a familiar and intuitive API.
 
 ## ✨ Features
 

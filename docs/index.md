@@ -1,10 +1,10 @@
 ---
 layout: home
 
-title: ORM-like Querying for Local Arrays
+title: Type-Safe ORM-like Querying for Local Arrays
 hero:
   name: "ArrayQuery"
-  text: "ORM-like Querying for Local Arrays"
+  text: "Type-Safe ORM-like Querying for Arrays"
   tagline: "Manipulate and retrieve data from arrays with ease using a familiar and intuitive API."
   image:
     src: /images/logo.svg

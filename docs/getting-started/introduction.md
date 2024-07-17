@@ -1,6 +1,6 @@
 # Introduction to ArrayQuery
 
-ArrayQuery is a powerful TypeScript library designed to bring ORM-like querying capabilities to local arrays. It provides an intuitive and efficient way to manipulate and retrieve data from arrays, offering functionality similar to database querying but for in-memory JavaScript/TypeScript arrays.
+ArrayQuery is a powerful TypeScript library designed to bring Type-Safe ORM-like querying capabilities to local arrays. It provides an intuitive and efficient way to manipulate and retrieve data from arrays, offering functionality similar to database querying but for in-memory JavaScript/TypeScript arrays.
 
 ## What is ArrayQuery?
 

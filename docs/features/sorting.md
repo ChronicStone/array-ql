@@ -212,32 +212,3 @@ Result:
   { id: 3, date: '2023-12-01' }
 ]
 ```
-
-4. Sorting by a computed value:
-
-```ts twoslash
-import { query } from '@chronicstone/array-query'
-
-const data = [
-  { id: 1, firstName: 'John', lastName: 'Doe' },
-  { id: 2, firstName: 'Jane', lastName: 'Smith' },
-  { id: 3, firstName: 'Alice', lastName: 'Johnson' }
-]
-
-const result = query(data, {
-  sort: {
-    key: 'firstName',
-    dir: 'asc',
-    parser: (value, item) => `${item.lastName}, ${item.firstName}`
-  }
-})
-```
-
-Result:
-```ts twoslash
-[
-  { id: 3, firstName: 'Alice', lastName: 'Johnson' },
-  { id: 2, firstName: 'Jane', lastName: 'Smith' },
-  { id: 1, firstName: 'John', lastName: 'Doe' }
-]
-```
