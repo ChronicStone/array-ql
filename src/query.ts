@@ -23,12 +23,13 @@ export function query<T extends GenericObject, P extends QueryParams>(
     const sortArray = Array.isArray(params.sort) ? params.sort : [params.sort]
 
     result = result.sort((a, b) => {
-      for (const { key, dir } of sortArray) {
-        const aValue = getObjectProperty(a, key)
-        const bValue = getObjectProperty(b, key)
+      for (const { key, dir, parser } of sortArray) {
+        const parserHandler = typeof parser === 'function' ? parser : (v: any) => parser === 'number' ? Number(v) : parser === 'boolean' ? Boolean(v) : parser === 'string' ? String(v) : v
+        const aParsed = parserHandler(getObjectProperty(a, key)) ?? null
+        const bParsed = parserHandler(getObjectProperty(b, key)) ?? null
 
-        if (aValue !== bValue) {
-          const comparison = (aValue < bValue) ? -1 : 1
+        if (aParsed !== bParsed) {
+          const comparison = (aParsed < bParsed) ? -1 : 1
           return dir === 'asc' ? comparison : -comparison
         }
       }
@@ -162,7 +163,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
     const unpaginatedRows = [...result]
     const totalRows = result.length
     const totalPages = Math.ceil(totalRows / params.limit)
-    const start = params.offset ?? 0
+    const start = ((params?.page ?? 1) - 1) * params.limit
     const end = start + params.limit
     result = result.slice(start, end)
 

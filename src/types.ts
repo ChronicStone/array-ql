@@ -66,6 +66,7 @@ export interface SearchOptions {
 export interface SortOptions {
   key: string
   dir?: 'asc' | 'desc'
+  parser?: 'number' | 'boolean' | 'string' | ((value: any) => string | number | boolean | null | undefined)
 }
 
 export interface QueryParams {
@@ -73,7 +74,7 @@ export interface QueryParams {
   search?: SearchOptions
   filter?: FilterOptions
   limit?: number
-  offset?: number
+  page?: number
 }
 
 export type QueryResult<T extends GenericObject, P extends QueryParams> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : { rows: T[] }

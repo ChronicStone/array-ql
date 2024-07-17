@@ -1,0 +1,199 @@
+[
+  {
+    "title": "Basic single field search",
+    "data": [
+      { "id": 1, "name": "John Doe", "email": "john@example.com" },
+      { "id": 2, "name": "Jane Smith", "email": "jane@example.com" },
+      { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+    ],
+    "query": {
+      "search": {
+        "value": "john",
+        "keys": ["name"]
+      }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "email": "john@example.com" },
+        { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+
+      ]
+    }
+  },
+  {
+    "title": "Multi-field search",
+    "data": [
+      { "id": 1, "name": "John Doe", "email": "john@example.com" },
+      { "id": 2, "name": "Jane Smith", "email": "jane@example.com" },
+      { "id": 3, "name": "Bob Thomas", "email": "bobjohn@example.com" }
+    ],
+    "query": {
+      "search": {
+        "value": "john",
+        "keys": ["name", "email"]
+      }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "email": "john@example.com" },
+        { "id": 3, "name": "Bob Thomas", "email": "bobjohn@example.com" }
+      ]
+    }
+  },
+  {
+    "title": "Case-sensitive search",
+    "data": [
+      { "id": 1, "name": "JOHN Doe", "email": "JOHN@example.com" },
+      { "id": 2, "name": "Jane Smith", "email": "jane@example.com" },
+      { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+    ],
+    "query": {
+      "search": {
+        "value": "JOHN",
+        "keys": ["name"],
+        "caseSensitive": true
+      }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "JOHN Doe", "email": "JOHN@example.com" }
+      ]
+    }
+  },
+  {
+    "title": "Partial match search",
+    "data": [
+      { "id": 1, "name": "John Doe", "email": "john@example.com" },
+      { "id": 2, "name": "Jane Smith", "email": "jane@example.com" },
+      { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+    ],
+    "query": {
+      "search": {
+        "value": "oh",
+        "keys": ["name", "email"]
+      }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "email": "john@example.com" },
+        { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+
+      ]
+    }
+  },
+  {
+    "title": "Search with no results",
+    "data": [
+      { "id": 1, "name": "John Doe", "email": "john@example.com" },
+      { "id": 2, "name": "Jane Smith", "email": "jane@example.com" },
+      { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+    ],
+    "query": {
+      "search": {
+        "value": "xyz",
+        "keys": ["name", "email"]
+      }
+    },
+    "result": {
+      "rows": []
+    }
+  },
+  {
+    "title": "Search in nested fields",
+    "data": [
+      { "id": 1, "name": "John Doe", "contact": { "email": "john@example.com" } },
+      { "id": 2, "name": "Jane Smith", "contact": { "email": "jane@example.com" } },
+      { "id": 3, "name": "Bob Johnson", "contact": { "email": "bob@example.com" } }
+    ],
+    "query": {
+      "search": {
+        "value": "john",
+        "keys": ["contact.email"]
+      }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "contact": { "email": "john@example.com" } }
+      ]
+    }
+  },
+  {
+    "title": "Search with empty value",
+    "data": [
+      { "id": 1, "name": "John Doe", "email": "john@example.com" },
+      { "id": 2, "name": "Jane Smith", "email": "jane@example.com" },
+      { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+    ],
+    "query": {
+      "search": {
+        "value": "",
+        "keys": ["name", "email"]
+      }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "email": "john@example.com" },
+        { "id": 2, "name": "Jane Smith", "email": "jane@example.com" },
+        { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+      ]
+    }
+  },
+  {
+    "title": "Search with number fields",
+    "data": [
+      { "id": 1, "name": "John Doe", "age": 30 },
+      { "id": 2, "name": "Jane Smith", "age": 25 },
+      { "id": 3, "name": "Bob Johnson", "age": 35 }
+    ],
+    "query": {
+      "search": {
+        "value": "30",
+        "keys": ["name", "age"]
+      }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "age": 30 }
+      ]
+    }
+  },
+  {
+    "title": "Search with boolean fields",
+    "data": [
+      { "id": 1, "name": "John Doe", "isActive": true },
+      { "id": 2, "name": "Jane Smith", "isActive": false },
+      { "id": 3, "name": "Bob Johnson", "isActive": true }
+    ],
+    "query": {
+      "search": {
+        "value": "true",
+        "keys": ["name", "isActive"]
+      }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "isActive": true },
+        { "id": 3, "name": "Bob Johnson", "isActive": true }
+      ]
+    }
+  },
+  {
+    "title": "Search with array fields",
+    "data": [
+      { "id": 1, "name": "John Doe", "tags": ["developer", "javascript"] },
+      { "id": 2, "name": "Jane Smith", "tags": ["designer", "ui"] },
+      { "id": 3, "name": "Bob Johnson", "tags": ["manager", "agile"] }
+    ],
+    "query": {
+      "search": {
+        "value": "javascript",
+        "keys": ["name", "tags"]
+      }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "tags": ["developer", "javascript"] }
+      ]
+    }
+  }
+]

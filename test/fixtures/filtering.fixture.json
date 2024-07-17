@@ -1,0 +1,378 @@
+[
+  {
+    "title": "Contains match mode",
+    "data": [
+      { "id": 1, "name": "John Doe", "email": "john@example.com" },
+      { "id": 2, "name": "Jane Smith", "email": "jane@example.com" },
+      { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+    ],
+    "query": {
+      "filter": [
+        { "key": "name", "matchMode": "contains", "value": "oh" }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "email": "john@example.com" },
+        { "id": 3, "name": "Bob Johnson", "email": "bob@example.com" }
+
+      ]
+    }
+  },
+  {
+    "title": "Between match mode with numbers",
+    "data": [
+      { "id": 1, "name": "John", "age": 25 },
+      { "id": 2, "name": "Jane", "age": 30 },
+      { "id": 3, "name": "Bob", "age": 35 }
+    ],
+    "query": {
+      "filter": [
+        { "key": "age", "matchMode": "between", "value": [28, 32] }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Jane", "age": 30 }
+      ]
+    }
+  },
+  {
+    "title": "Between match mode with dates",
+    "data": [
+      { "id": 1, "name": "John", "joinDate": "2023-01-15" },
+      { "id": 2, "name": "Jane", "joinDate": "2023-06-20" },
+      { "id": 3, "name": "Bob", "joinDate": "2023-12-05" }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "joinDate",
+          "matchMode": "between",
+          "value": ["2023-05-01", "2023-08-31"],
+          "params": { "dateMode": true }
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Jane", "joinDate": "2023-06-20" }
+      ]
+    }
+  },
+  {
+    "title": "Equals match mode",
+    "data": [
+      { "id": 1, "name": "John", "status": "active" },
+      { "id": 2, "name": "Jane", "status": "inactive" },
+      { "id": 3, "name": "Bob", "status": "active" }
+    ],
+    "query": {
+      "filter": [
+        { "key": "status", "matchMode": "equals", "value": "active" }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "status": "active" },
+        { "id": 3, "name": "Bob", "status": "active" }
+      ]
+    }
+  },
+  {
+    "title": "Not Equals match mode",
+    "data": [
+      { "id": 1, "name": "John", "status": "active" },
+      { "id": 2, "name": "Jane", "status": "inactive" },
+      { "id": 3, "name": "Bob", "status": "active" }
+    ],
+    "query": {
+      "filter": [
+        { "key": "status", "matchMode": "notEquals", "value": "active" }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Jane", "status": "inactive" }
+      ]
+    }
+  },
+  {
+    "title": "Greater Than match mode",
+    "data": [
+      { "id": 1, "name": "John", "age": 25 },
+      { "id": 2, "name": "Jane", "age": 30 },
+      { "id": 3, "name": "Bob", "age": 35 }
+    ],
+    "query": {
+      "filter": [
+        { "key": "age", "matchMode": "greaterThan", "value": 28 }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Jane", "age": 30 },
+        { "id": 3, "name": "Bob", "age": 35 }
+      ]
+    }
+  },
+  {
+    "title": "Greater Than or Equal match mode",
+    "data": [
+      { "id": 1, "name": "John", "age": 25 },
+      { "id": 2, "name": "Jane", "age": 30 },
+      { "id": 3, "name": "Bob", "age": 35 }
+    ],
+    "query": {
+      "filter": [
+        { "key": "age", "matchMode": "greaterThanOrEqual", "value": 30 }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Jane", "age": 30 },
+        { "id": 3, "name": "Bob", "age": 35 }
+      ]
+    }
+  },
+  {
+    "title": "Less Than match mode",
+    "data": [
+      { "id": 1, "name": "John", "age": 25 },
+      { "id": 2, "name": "Jane", "age": 30 },
+      { "id": 3, "name": "Bob", "age": 35 }
+    ],
+    "query": {
+      "filter": [
+        { "key": "age", "matchMode": "lessThan", "value": 30 }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "age": 25 }
+      ]
+    }
+  },
+  {
+    "title": "Less Than or Equal match mode",
+    "data": [
+      { "id": 1, "name": "John", "age": 25 },
+      { "id": 2, "name": "Jane", "age": 30 },
+      { "id": 3, "name": "Bob", "age": 35 }
+    ],
+    "query": {
+      "filter": [
+        { "key": "age", "matchMode": "lessThanOrEqual", "value": 30 }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "age": 25 },
+        { "id": 2, "name": "Jane", "age": 30 }
+      ]
+    }
+  },
+  {
+    "title": "Exists match mode",
+    "data": [
+      { "id": 1, "name": "John", "age": 25 },
+      { "id": 2, "name": "Jane" },
+      { "id": 3, "name": "Bob", "age": 35 }
+    ],
+    "query": {
+      "filter": [
+        { "key": "age", "matchMode": "exists", "value": true }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "age": 25 },
+        { "id": 3, "name": "Bob", "age": 35 }
+      ]
+    }
+  },
+  {
+    "title": "Array Length match mode",
+    "data": [
+      { "id": 1, "name": "John", "skills": ["JavaScript", "TypeScript", "React"] },
+      { "id": 2, "name": "Jane", "skills": ["Python", "Django"] },
+      { "id": 3, "name": "Bob", "skills": ["Java", "Spring", "Hibernate", "SQL"] }
+    ],
+    "query": {
+      "filter": [
+        { "key": "skills", "matchMode": "arrayLength", "value": 3 }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "skills": ["JavaScript", "TypeScript", "React"] }
+      ]
+    }
+  },
+  {
+    "title": "Object Match mode",
+    "data": [
+      { "id": 1, "name": "John", "account": { "type": "premium", "status": "active" } },
+      { "id": 2, "name": "Jane", "account": { "type": "basic", "status": "inactive" } },
+      { "id": 3, "name": "Bob", "account": { "type": "premium", "status": "inactive" } }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "account",
+          "matchMode": "objectMatch",
+          "value": { "type": "premium", "status": "active" },
+          "params": {
+            "operator": "AND",
+            "properties": [
+              { "key": "type", "matchMode": "equals" },
+              { "key": "status", "matchMode": "equals" }
+            ]
+          }
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "account": { "type": "premium", "status": "active" } }
+      ]
+    }
+  },
+  {
+    "title": "Object Match - ALL objects in the array match ALL conditions",
+    "data": [
+      { "id": 1, "name": "John", "orders": [{ "id": 1, "total": 100 }, { "id": 2, "total": 200 }] },
+      { "id": 2, "name": "Jane", "orders": [{ "id": 3, "total": 150 }, { "id": 4, "total": 300 }] },
+      { "id": 3, "name": "Bob", "orders": [{ "id": 5, "total": 50 }, { "id": 6, "total": 250 }] }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "orders",
+          "matchMode": "objectMatch",
+          "value": { "total": 50 },
+          "operator": "AND",
+          "params": {
+            "operator": "AND",
+            "properties": [
+              { "key": "total", "matchMode": "greaterThan" }
+            ]
+          }
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "orders": [{ "id": 1, "total": 100 }, { "id": 2, "total": 200 }] },
+        { "id": 2, "name": "Jane", "orders": [{ "id": 3, "total": 150 }, { "id": 4, "total": 300 }] }
+      ]
+    }
+  },
+  {
+    "title": "Object Match - ALL objects in the array match SOME of the conditions",
+    "data": [
+      { "id": 1, "name": "John", "orders": [{ "id": 1, "total": 100, "status": "completed" }, { "id": 2, "total": 200, "status": "pending" }] },
+      { "id": 2, "name": "Jane", "orders": [{ "id": 3, "total": 150, "status": "completed" }, { "id": 4, "total": 300, "status": "completed" }] },
+      { "id": 3, "name": "Bob", "orders": [{ "id": 5, "total": 50, "status": "pending" }, { "id": 6, "total": 250, "status": "completed" }] }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "orders",
+          "matchMode": "objectMatch",
+          "value": { "total": 100, "status": "completed" },
+          "operator": "AND",
+          "params": {
+            "operator": "OR",
+            "properties": [
+              { "key": "total", "matchMode": "greaterThan" },
+              { "key": "status", "matchMode": "equals" }
+            ]
+          }
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "orders": [{ "id": 1, "total": 100, "status": "completed" }, { "id": 2, "total": 200, "status": "pending" }] },
+        { "id": 2, "name": "Jane", "orders": [{ "id": 3, "total": 150, "status": "completed" }, { "id": 4, "total": 300, "status": "completed" }] }
+      ]
+    }
+  },
+  {
+    "title": "Object Match - SOME objects in the array match ALL conditions",
+    "data": [
+      { "id": 1, "name": "John", "orders": [{ "id": 1, "total": 100, "status": "completed" }, { "id": 2, "total": 200, "status": "pending" }] },
+      { "id": 2, "name": "Jane", "orders": [{ "id": 3, "total": 150, "status": "completed" }, { "id": 4, "total": 300, "status": "completed" }] },
+      { "id": 3, "name": "Bob", "orders": [{ "id": 5, "total": 50, "status": "pending" }, { "id": 6, "total": 250, "status": "completed" }] }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "orders",
+          "matchMode": "objectMatch",
+          "value": { "total": 200, "status": "completed" },
+          "operator": "OR",
+          "params": {
+            "operator": "AND",
+            "properties": [
+              { "key": "total", "matchMode": "greaterThan" },
+              { "key": "status", "matchMode": "equals" }
+            ]
+          }
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Jane", "orders": [{ "id": 3, "total": 150, "status": "completed" }, { "id": 4, "total": 300, "status": "completed" }] }
+      ]
+    }
+  },
+  {
+    "title": "Combined filters with AND logic",
+    "data": [
+      { "id": 1, "name": "John", "age": 30, "status": "active" },
+      { "id": 2, "name": "Jane", "age": 25, "status": "inactive" },
+      { "id": 3, "name": "Bob", "age": 35, "status": "active" }
+    ],
+    "query": {
+      "filter": [
+        { "key": "age", "matchMode": "greaterThan", "value": 25 },
+        { "key": "status", "matchMode": "equals", "value": "active" }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "age": 30, "status": "active" },
+        { "id": 3, "name": "Bob", "age": 35, "status": "active" }
+      ]
+    }
+  },
+  {
+    "title": "Combined filters with OR logic",
+    "data": [
+      { "id": 1, "name": "John", "age": 30, "status": "active" },
+      { "id": 2, "name": "Jane", "age": 25, "status": "inactive" },
+      { "id": 3, "name": "Bob", "age": 35, "status": "active" }
+    ],
+    "query": {
+      "filter": [
+        {
+          "operator": "OR",
+          "filters": [
+            { "key": "age", "matchMode": "lessThan", "value": 30 },
+            { "key": "status", "matchMode": "equals", "value": "active" }
+          ]
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John", "age": 30, "status": "active" },
+        { "id": 2, "name": "Jane", "age": 25, "status": "inactive" },
+        { "id": 3, "name": "Bob", "age": 35, "status": "active" }
+      ]
+    }
+  }
+]

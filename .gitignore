@@ -12,3 +12,4 @@ temp
 playground/.nuxt
 docs/.vitepress/dist
 docs/.vitepress/cache
+.vercel

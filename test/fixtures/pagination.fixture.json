@@ -1,0 +1,137 @@
+[
+  {
+    "title": "Basic pagination - first page",
+    "data": [
+      { "id": 1, "name": "Item 1" },
+      { "id": 2, "name": "Item 2" },
+      { "id": 3, "name": "Item 3" },
+      { "id": 4, "name": "Item 4" },
+      { "id": 5, "name": "Item 5" }
+    ],
+    "query": {
+      "page": 1,
+      "limit": 2
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "Item 1" },
+        { "id": 2, "name": "Item 2" }
+      ],
+      "totalPages": 3,
+      "totalRows": 5
+    }
+  },
+  {
+    "title": "Pagination - middle page",
+    "data": [
+      { "id": 1, "name": "Item 1" },
+      { "id": 2, "name": "Item 2" },
+      { "id": 3, "name": "Item 3" },
+      { "id": 4, "name": "Item 4" },
+      { "id": 5, "name": "Item 5" }
+    ],
+    "query": {
+      "page": 2,
+      "limit": 2
+    },
+    "result": {
+      "rows": [
+        { "id": 3, "name": "Item 3" },
+        { "id": 4, "name": "Item 4" }
+      ],
+      "totalPages": 3,
+      "totalRows": 5
+    }
+  },
+  {
+    "title": "Pagination - last page",
+    "data": [
+      { "id": 1, "name": "Item 1" },
+      { "id": 2, "name": "Item 2" },
+      { "id": 3, "name": "Item 3" },
+      { "id": 4, "name": "Item 4" },
+      { "id": 5, "name": "Item 5" }
+    ],
+    "query": {
+      "page": 3,
+      "limit": 2
+    },
+    "result": {
+      "rows": [
+        { "id": 5, "name": "Item 5" }
+      ],
+      "totalPages": 3,
+      "totalRows": 5
+    }
+  },
+  {
+    "title": "Pagination - page out of range (too high)",
+    "data": [
+      { "id": 1, "name": "Item 1" },
+      { "id": 2, "name": "Item 2" },
+      { "id": 3, "name": "Item 3" }
+    ],
+    "query": {
+      "page": 5,
+      "limit": 2
+    },
+    "result": {
+      "rows": [],
+      "totalPages": 2,
+      "totalRows": 3
+    }
+  },
+  {
+    "title": "Pagination - limit larger than dataset",
+    "data": [
+      { "id": 1, "name": "Item 1" },
+      { "id": 2, "name": "Item 2" },
+      { "id": 3, "name": "Item 3" }
+    ],
+    "query": {
+      "page": 1,
+      "limit": 10
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "Item 1" },
+        { "id": 2, "name": "Item 2" },
+        { "id": 3, "name": "Item 3" }
+      ],
+      "totalPages": 1,
+      "totalRows": 3
+    }
+  },
+  {
+    "title": "Pagination - empty dataset",
+    "data": [],
+    "query": {
+      "page": 1,
+      "limit": 5
+    },
+    "result": {
+      "rows": [],
+      "totalPages": 0,
+      "totalRows": 0
+    }
+  },
+  {
+    "title": "Pagination - limit of 1",
+    "data": [
+      { "id": 1, "name": "Item 1" },
+      { "id": 2, "name": "Item 2" },
+      { "id": 3, "name": "Item 3" }
+    ],
+    "query": {
+      "page": 2,
+      "limit": 1
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Item 2" }
+      ],
+      "totalPages": 3,
+      "totalRows": 3
+    }
+  }
+]

@@ -1,0 +1,136 @@
+[
+  {
+    "title": "Sort by single field ascending",
+    "data": [
+      { "id": 3, "name": "Charlie", "age": 30 },
+      { "id": 1, "name": "Alice", "age": 25 },
+      { "id": 2, "name": "Bob", "age": 35 }
+    ],
+    "query": {
+      "sort": { "key": "name", "dir": "asc" }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "Alice", "age": 25 },
+        { "id": 2, "name": "Bob", "age": 35 },
+        { "id": 3, "name": "Charlie", "age": 30 }
+      ]
+    }
+  },
+  {
+    "title": "Sort by single field descending",
+    "data": [
+      { "id": 3, "name": "Charlie", "age": 30 },
+      { "id": 1, "name": "Alice", "age": 25 },
+      { "id": 2, "name": "Bob", "age": 35 }
+    ],
+    "query": {
+      "sort": { "key": "age", "dir": "desc" }
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Bob", "age": 35 },
+        { "id": 3, "name": "Charlie", "age": 30 },
+        { "id": 1, "name": "Alice", "age": 25 }
+      ]
+    }
+  },
+  {
+    "title": "Sort by multiple fields",
+    "data": [
+      { "id": 1, "name": "Alice", "age": 30 },
+      { "id": 2, "name": "Bob", "age": 25 },
+      { "id": 3, "name": "Charlie", "age": 30 },
+      { "id": 4, "name": "David", "age": 25 }
+    ],
+    "query": {
+      "sort": [
+        { "key": "age", "dir": "asc" },
+        { "key": "name", "dir": "desc" }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 4, "name": "David", "age": 25 },
+        { "id": 2, "name": "Bob", "age": 25 },
+        { "id": 3, "name": "Charlie", "age": 30 },
+        { "id": 1, "name": "Alice", "age": 30 }
+      ]
+    }
+  },
+  {
+    "title": "Sort by nested field",
+    "data": [
+      { "id": 1, "name": "John", "scores": { "math": 85, "science": 92 } },
+      { "id": 2, "name": "Jane", "scores": { "math": 90, "science": 88 } },
+      { "id": 3, "name": "Bob", "scores": { "math": 78, "science": 95 } }
+    ],
+    "query": {
+      "sort": { "key": "scores.math", "dir": "desc" }
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Jane", "scores": { "math": 90, "science": 88 } },
+        { "id": 1, "name": "John", "scores": { "math": 85, "science": 92 } },
+        { "id": 3, "name": "Bob", "scores": { "math": 78, "science": 95 } }
+      ]
+    }
+  },
+  {
+    "title": "Sort with null values - asc (nulls first)",
+    "data": [
+      { "id": 1, "name": "Alice", "age": 30 },
+      { "id": 2, "name": "Bob", "age": null },
+      { "id": 3, "name": "Charlie", "age": 25 }
+    ],
+    "query": {
+      "sort": { "key": "age", "dir": "asc" }
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "Bob", "age": null },
+        { "id": 3, "name": "Charlie", "age": 25 },
+        { "id": 1, "name": "Alice", "age": 30 }
+      ]
+    }
+  },
+  {
+    "title": "Sort with undefined values - desc (undefined last)",
+    "data": [
+      { "id": 1, "name": "Alice", "age": 30 },
+      { "id": 2, "name": "Bob" },
+      { "id": 3, "name": "Charlie", "age": 25 }
+    ],
+    "query": {
+      "sort": { "key": "age", "dir": "desc" }
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "Alice", "age": 30 },
+        { "id": 3, "name": "Charlie", "age": 25 },
+        { "id": 2, "name": "Bob" }
+      ]
+    }
+  },
+  {
+    "title": "Sort with mix of types (numbers and strings)",
+    "data": [
+      { "id": 1, "value": 5 },
+      { "id": 2, "value": "10" },
+      { "id": 3, "value": "3" },
+      { "id": 4, "value": 15 }
+    ],
+    "query": {
+      "sort": { "key": "value", "dir": "asc", "parser": "number" }
+    },
+    "result": {
+      "rows": [
+        { "id": 3, "value": "3" },
+        { "id": 1, "value": 5 },
+        { "id": 2, "value": "10" },
+        { "id": 4, "value": 15 }
+      ]
+    }
+  }
+
+]
