@@ -50,15 +50,28 @@ export type QueryFilter = {
   operator?: Operator
 } & MatchModeCore
 
+export interface QueryFilterGroup {
+  operator: Operator
+  filters: QueryFilter[]
+}
+
 export interface SearchOptions {
   value: string
   keys: string[] | Array<{ key: string, caseSensitive?: boolean }>
   caseSensitive?: boolean
 }
+
+export interface SortOptions {
+  key: string
+  dir?: 'asc' | 'desc'
+}
+
+export type FilterOptions = Array<QueryFilter | QueryFilterGroup>
+
 export interface QueryParams {
-  filter?: QueryFilter[]
   sort?: SortOptions
   search?: SearchOptions
+  filter?: FilterOptions
   limit?: number
   offset?: number
 }

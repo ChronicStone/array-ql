@@ -10,7 +10,9 @@ export function query<T extends GenericObject, P extends QueryParams>(
   if (params.search && params.search.value) {
     result = result.filter((item) => {
       for (const key of params.search?.keys ?? []) {
-        if (processSearchQuery({ key, object: item, value: params.search?.value as string }))
+        const field = typeof key === 'string' ? key : key.key
+        const caseSensitive = typeof key === 'string' ? (params.search?.caseSensitive ?? false) : key.caseSensitive ?? false
+        if (processSearchQuery({ key: field, caseSensitive, object: item, value: params.search!.value }))
           return true
       }
       return false
@@ -33,111 +35,115 @@ export function query<T extends GenericObject, P extends QueryParams>(
 
   if (Array.isArray(params.filter) && params.filter.length) {
     result = result.filter((item) => {
-      return (params.filter ?? []).every((filter) => {
-        const value = getObjectProperty(item, filter.key)
-        const operator = typeof filter.operator === 'function' ? filter.operator() : filter.operator ?? 'OR'
-        if (filter.matchMode === 'equals') {
-          return processFilterWithLookup({
-            type: 'equals',
-            params: null,
-            operator,
-            value,
-            filter: filter.value,
-          })
-        }
+      return (params.filter ?? []).every((group) => {
+        const filters = 'filters' in group ? group.filters : [group]
+        const op = 'filters' in group ? group.operator : 'OR'
+        return filters[op === 'AND' ? 'every' : 'some' as const]((filter) => {
+          const value = getObjectProperty(item, filter.key)
+          const operator = typeof filter.operator === 'function' ? filter.operator() : filter.operator ?? 'OR'
+          if (filter.matchMode === 'equals') {
+            return processFilterWithLookup({
+              type: 'equals',
+              params: null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
 
-        if (filter.matchMode === 'contains') {
-          return processFilterWithLookup({
-            type: 'contains',
-            params: null,
-            operator,
-            value,
-            filter: filter.value,
-          })
-        }
-        if (filter.matchMode === 'between') {
-          return processFilterWithLookup({
-            type: 'between',
-            params: filter?.params ?? null,
-            operator,
-            value,
-            filter: filter.value,
-          })
-        }
+          if (filter.matchMode === 'contains') {
+            return processFilterWithLookup({
+              type: 'contains',
+              params: null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
+          if (filter.matchMode === 'between') {
+            return processFilterWithLookup({
+              type: 'between',
+              params: filter?.params ?? null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
 
-        if (filter.matchMode === 'greaterThan') {
-          return processFilterWithLookup({
-            type: 'greaterThan',
-            params: filter?.params ?? null,
-            operator,
-            value,
-            filter: filter.value,
-          })
-        }
+          if (filter.matchMode === 'greaterThan') {
+            return processFilterWithLookup({
+              type: 'greaterThan',
+              params: filter?.params ?? null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
 
-        if (filter.matchMode === 'greaterThanOrEqual') {
-          return processFilterWithLookup({
-            type: 'greaterThanOrEqual',
-            params: filter?.params ?? null,
-            operator,
-            value,
-            filter: filter.value,
-          })
-        }
+          if (filter.matchMode === 'greaterThanOrEqual') {
+            return processFilterWithLookup({
+              type: 'greaterThanOrEqual',
+              params: filter?.params ?? null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
 
-        if (filter.matchMode === 'lessThan') {
-          return processFilterWithLookup({
-            type: 'lessThan',
-            params: filter?.params ?? null,
-            operator,
-            value,
-            filter: filter.value,
-          })
-        }
+          if (filter.matchMode === 'lessThan') {
+            return processFilterWithLookup({
+              type: 'lessThan',
+              params: filter?.params ?? null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
 
-        if (filter.matchMode === 'lessThanOrEqual') {
-          return processFilterWithLookup({
-            type: 'lessThanOrEqual',
-            params: filter?.params ?? null,
-            operator,
-            value,
-            filter: filter.value,
-          })
-        }
+          if (filter.matchMode === 'lessThanOrEqual') {
+            return processFilterWithLookup({
+              type: 'lessThanOrEqual',
+              params: filter?.params ?? null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
 
-        if (filter.matchMode === 'exists') {
-          return processFilterWithLookup({
-            type: 'exists',
-            params: null,
-            operator,
-            value,
-            filter: filter.value,
-          })
-        }
+          if (filter.matchMode === 'exists') {
+            return processFilterWithLookup({
+              type: 'exists',
+              params: null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
 
-        if (filter.matchMode === 'arrayLength') {
-          return processFilterWithLookup({
-            type: 'arrayLength',
-            params: null,
-            operator,
-            value,
-            filter: filter.value,
-          })
-        }
+          if (filter.matchMode === 'arrayLength') {
+            return processFilterWithLookup({
+              type: 'arrayLength',
+              params: null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
 
-        if (filter.matchMode === 'objectMatch') {
-          const params = typeof filter.params === 'function' ? filter.params(filter.value) : filter.params
-          const filterValue = params?.transformFilterValue?.(filter.value) ?? filter.value
-          return processFilterWithLookup({
-            type: 'objectMatch',
-            params,
-            operator,
-            value: params?.applyAtRoot ? item : value,
-            filter: filterValue,
-          })
-        }
+          if (filter.matchMode === 'objectMatch') {
+            const params = typeof filter.params === 'function' ? filter.params(filter.value) : filter.params
+            const filterValue = params?.transformFilterValue?.(filter.value) ?? filter.value
+            return processFilterWithLookup({
+              type: 'objectMatch',
+              params,
+              operator,
+              value: params?.applyAtRoot ? item : value,
+              filter: filterValue,
+            })
+          }
 
-        return false
+          return false
+        })
       })
     })
   }

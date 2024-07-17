@@ -10,3 +10,5 @@ logs
 node_modules
 temp
 playground/.nuxt
+docs/.vitepress/dist
+docs/.vitepress/cache
