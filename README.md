@@ -19,16 +19,16 @@
 
 ## INSTALLATION
 
-\```bash
+```bash
 npm install @chronicstone/array-query
 yarn add @chronicstone/array-query
 pnpm add @chronicstone/array-query
 bun add @chronicstone/array-query
-\```
+```
 
 ## USAGE EXAMPLE
 
-\```ts
+```ts
 import { query } from '@chronicstone/array-query'
 
 const users = [
@@ -61,7 +61,7 @@ const { totalRows, totalPages, rows } = query(users, {
     { key: 'age', matchMode: 'greaterThan', value: 25 },
   ]
 })
-\```
+```
 
 This example demonstrates pagination, multi-field sorting, full-text searching, and complex filtering with nested conditions and array field matching.
 
