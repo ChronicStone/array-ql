@@ -7,7 +7,7 @@ export function query<T extends GenericObject, P extends QueryParams>(
 ): QueryResult<T, P> {
   let result: T[] = [...data]
 
-  if (params.search?.value) {
+  if (params.search && params.search.value) {
     result = result.filter((item) => {
       for (const key of params.search?.keys ?? []) {
         if (processSearchQuery({ key, object: item, value: params.search?.value as string }))
@@ -163,14 +163,18 @@ export function query<T extends GenericObject, P extends QueryParams>(
   }
 }
 
-function processSearchQuery(params: { key: string, object: Record<string, any>, value: string }): boolean {
-  const { key, object, value } = params
+function parseSearchValue(value: any, caseSensitive: boolean): string {
+  return (caseSensitive ? value?.toString() : value?.toString()?.toLowerCase?.()) ?? ''
+}
+
+function processSearchQuery(params: { key: string, object: Record<string, any>, value: string, caseSensitive: boolean }): boolean {
+  const { key, object, value, caseSensitive } = params
   const keys = key.split('.')
 
   let current: any = object
   for (let i = 0; i < keys.length; i++) {
     if (Array.isArray(current))
-      return current.some(item => processSearchQuery({ key: keys.slice(i).join('.'), object: item, value }))
+      return current.some(item => processSearchQuery({ key: keys.slice(i).join('.'), object: item, value, caseSensitive }))
 
     else if (current && Object.prototype.hasOwnProperty.call(current, keys[i]))
       current = current[keys[i]]
@@ -180,10 +184,10 @@ function processSearchQuery(params: { key: string, object: Record<string, any>, 
   }
 
   if (Array.isArray(current))
-    return current.some(element => element.toString().toLowerCase().includes(value.toLowerCase()))
+    return current.some(element => parseSearchValue(element, caseSensitive).includes(parseSearchValue(value, caseSensitive)))
 
   else
-    return current?.toString().toLowerCase().includes(value.toLowerCase()) ?? false
+    return parseSearchValue(current, caseSensitive).includes(parseSearchValue(value, caseSensitive)) ?? false
 }
 
 function processFilterWithLookup<
