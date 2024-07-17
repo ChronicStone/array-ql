@@ -75,7 +75,7 @@ export interface QueryParams {
   limit?: number
   offset?: number
 }
-export type QueryResult<T extends GenericObject, P extends QueryParams> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : { totalRows: number, totalPages: number, rows: T[] }
+export type QueryResult<T extends GenericObject, P extends QueryParams> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : { rows: T[] }
 
 export interface MatchModeProcessorMap {
   equals: ({ value, filter }: { value: any, filter: any }) => boolean
