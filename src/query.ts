@@ -1,4 +1,4 @@
-import type { FilterMatchMode, GenericObject, MatchModeProcessorMap, QueryParams, QueryResult } from './types'
+import type { FilterMatchMode, GenericObject, MatchModeProcessorMap, QueryFilter, QueryFilterGroup, QueryParams, QueryResult } from './types'
 import { MatchModeProcessor, getObjectProperty, validateBetweenPayload } from './utils'
 
 export function query<T extends GenericObject, P extends QueryParams>(
@@ -38,7 +38,10 @@ export function query<T extends GenericObject, P extends QueryParams>(
 
   if (Array.isArray(params.filter) && params.filter.length) {
     result = result.filter((item) => {
-      return (params.filter ?? []).every((group) => {
+      const IS_GROUP = params.filter?.every(filter => 'filters' in filter) ?? false
+      const METHOD = IS_GROUP ? 'some' : 'every' as const
+      const FILTERS = (params?.filter ?? []) as any[]
+      return FILTERS[METHOD]((group: QueryFilter | QueryFilterGroup) => {
         const filters = 'filters' in group ? group.filters : [group]
         const op = 'filters' in group ? group.operator : 'OR'
         return filters[op === 'AND' ? 'every' : 'some' as const]((filter) => {

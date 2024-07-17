@@ -55,6 +55,8 @@ export interface QueryFilterGroup {
   filters: QueryFilter[]
 }
 
+export type FilterOptions = Array<QueryFilterGroup> | Array<QueryFilter>
+
 export interface SearchOptions {
   value: string
   keys: string[] | Array<{ key: string, caseSensitive?: boolean }>
@@ -66,8 +68,6 @@ export interface SortOptions {
   dir?: 'asc' | 'desc'
 }
 
-export type FilterOptions = Array<QueryFilter | QueryFilterGroup>
-
 export interface QueryParams {
   sort?: SortOptions | Array<SortOptions>
   search?: SearchOptions
@@ -75,6 +75,7 @@ export interface QueryParams {
   limit?: number
   offset?: number
 }
+
 export type QueryResult<T extends GenericObject, P extends QueryParams> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : { rows: T[] }
 
 export interface MatchModeProcessorMap {
