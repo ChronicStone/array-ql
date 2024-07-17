@@ -56,9 +56,9 @@ export default defineConfig({
         text: 'Features',
         items: [
           { text: 'Pagination', link: '/features/pagination' },
+          { text: 'Sorting', link: '/features/sorting' },
           { text: 'Searching', link: '/features/searching' },
           { text: 'Filtering', link: '/features/filtering' },
-          { text: 'Sorting', link: '/features/sorting' },
         ],
       },
       {

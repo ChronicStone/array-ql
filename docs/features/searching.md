@@ -66,7 +66,6 @@ const data = [
   { id: 3, title: 'Google Pixel 5', description: 'Pure Android experience' },
   { id: 4, title: 'OnePlus 9', description: 'Flagship killer smartphone' }
 ]
-// ---cut-before---
 
 const result = query(data, {
   search: {
@@ -88,7 +87,6 @@ const data = [
   { id: 3, title: 'Google Pixel 5', description: 'Pure Android experience' },
   { id: 4, title: 'OnePlus 9', description: 'Flagship killer smartphone' }
 ]
-// ---cut-before---
 
 const result = query(data, {
   search: {
@@ -134,7 +132,6 @@ const data = [
     }
   }
 ]
-// ---cut-before---
 
 const result = query(data, {
   search: {
@@ -158,7 +155,6 @@ const data = [
   { id: 2, name: 'Jane Smith', tags: ['designer', 'ui', 'ux'] },
   { id: 3, name: 'Bob Johnson', tags: ['manager', 'agile', 'scrum'] }
 ]
-// ---cut-before---
 
 const result = query(data, {
   search: {

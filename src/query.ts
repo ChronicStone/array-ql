@@ -19,16 +19,19 @@ export function query<T extends GenericObject, P extends QueryParams>(
     })
   }
 
-  if (params.sort?.key) {
+  if (params.sort) {
+    const sortArray = Array.isArray(params.sort) ? params.sort : [params.sort]
+
     result = result.sort((a, b) => {
-      const aValue = getObjectProperty(a, params.sort?.key ?? '')
-      const bValue = getObjectProperty(b, params.sort?.key ?? '')
-      if (aValue === bValue)
-        return 0
-      if (aValue > bValue)
-        return params.sort?.dir === 'asc' ? 1 : -1
-      if (aValue < bValue)
-        return params.sort?.dir === 'asc' ? -1 : 1
+      for (const { key, dir } of sortArray) {
+        const aValue = getObjectProperty(a, key)
+        const bValue = getObjectProperty(b, key)
+
+        if (aValue !== bValue) {
+          const comparison = (aValue < bValue) ? -1 : 1
+          return dir === 'asc' ? comparison : -comparison
+        }
+      }
       return 0
     })
   }

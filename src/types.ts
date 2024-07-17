@@ -69,7 +69,7 @@ export interface SortOptions {
 export type FilterOptions = Array<QueryFilter | QueryFilterGroup>
 
 export interface QueryParams {
-  sort?: SortOptions
+  sort?: SortOptions | Array<SortOptions>
   search?: SearchOptions
   filter?: FilterOptions
   limit?: number
