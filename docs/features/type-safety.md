@@ -1,8 +1,8 @@
-## Type-Safe Queries
+# Type-Safe Queries
 
 ArrayQuery provides type safety for query parameters, ensuring that you can only use valid keys for sorting, searching, and filtering. This feature helps catch errors at compile-time and provides excellent autocompletion support in your IDE.
 
-### Sorting
+## Sorting
 
 When specifying the `key` for sorting, you'll get type-safe suggestions based on the properties of your data:
 
@@ -23,7 +23,7 @@ const result = query(users, {
 
 Hovering over the empty string will show a popover with valid options: `"id" | "name" | "age" | "email"`.
 
-### Searching
+## Searching
 
 The `keys` array in the search options is also type-safe:
 
@@ -47,7 +47,7 @@ const result = query(products, {
 
 The popover for the empty string will show: `"id" | "name" | "price" | "description"`.
 
-### Filtering
+## Filtering
 
 Filter keys are also type-safe, including for nested properties:
 
@@ -68,7 +68,7 @@ const result = query(employees, {
 })
 ```
 
-### Complex Nested Structures
+## Complex Nested Structures
 
 ArrayQuery handles complex nested structures with ease:
 
