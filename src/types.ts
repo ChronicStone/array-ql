@@ -1,6 +1,30 @@
 export type Primitive = string | number | symbol
 export type GenericObject = Record<Primitive, unknown>
 
+export type NestedPaths<T> = T extends Array<infer U>
+  ? `${NestedPaths<U>}`
+  : T extends object
+    ? {
+        [K in keyof T & (string | number)]: K extends string
+          ? `${K}` | `${K}.${NestedPaths<T[K]>}`
+          : string;
+      }[keyof T & (string | number)]
+    : string
+
+export type NestedPathsForType<T, P> = T extends Array<infer U>
+  ? NestedPathsForType<U, P>
+  : T extends object
+    ? {
+        [K in keyof T & (string | number)]: K extends string
+          ? T[K] extends P
+            ? `${K}` | `${K}.${NestedPathsForType<T[K], P>}`
+            : T[K] extends object
+              ? `${K}.${NestedPathsForType<T[K], P>}`
+              : string
+          : string;
+      }[keyof T & (string | number)]
+    : string
+
 export type Operator = 'AND' | 'OR' | (() => 'AND' | 'OR')
 
 export type FilterMatchMode =
@@ -44,40 +68,44 @@ export type MatchModeCore = ({
   params: ObjectMapFilterParams | ((value: any) => ObjectMapFilterParams)
 })
 
-export type QueryFilter = {
-  key: string
+export type QueryFilter<Paths extends string = string> = {
+  key: Paths
   value: any
   operator?: Operator
 } & MatchModeCore
 
-export interface QueryFilterGroup {
+export interface QueryFilterGroup<Paths extends string = string> {
   operator: Operator
-  filters: QueryFilter[]
+  filters: QueryFilter<Paths>[]
 }
 
-export type FilterOptions = Array<QueryFilterGroup> | Array<QueryFilter>
+export type FilterOptions<Paths extends string = string> = Array<QueryFilterGroup<Paths>> | Array<QueryFilter<Paths>>
 
-export interface SearchOptions {
+export interface SearchOptions<Paths extends string = string> {
   value: string
-  keys: string[] | Array<{ key: string, caseSensitive?: boolean }>
+  keys: Paths[] | Array<{ key: Paths, caseSensitive?: boolean }>
   caseSensitive?: boolean
 }
 
-export interface SortOptions {
-  key: string
+export interface SortOption<Paths extends string = string> {
+  key: Paths
   dir?: 'asc' | 'desc'
   parser?: 'number' | 'boolean' | 'string' | ((value: any) => string | number | boolean | null | undefined)
 }
 
-export interface QueryParams {
-  sort?: SortOptions | Array<SortOptions>
-  search?: SearchOptions
-  filter?: FilterOptions
+export interface QueryParams<
+  T extends GenericObject = GenericObject,
+  Paths extends NestedPaths<T> = NestedPaths<T>,
+  PrimitivePath extends string = NestedPathsForType<T, string | number | null | boolean | undefined>,
+> {
+  sort?: SortOption<PrimitivePath> | Array<SortOption<PrimitivePath>>
+  search?: SearchOptions<PrimitivePath>
+  filter?: FilterOptions<Paths>
   limit?: number
   page?: number
 }
 
-export type QueryResult<T extends GenericObject, P extends QueryParams> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : { rows: T[] }
+export type QueryResult<T extends GenericObject, P extends QueryParams<T>> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : { rows: T[] }
 
 export interface MatchModeProcessorMap {
   equals: ({ value, filter }: { value: any, filter: any }) => boolean

@@ -1,7 +1,7 @@
 import type { FilterMatchMode, GenericObject, MatchModeProcessorMap, QueryFilter, QueryFilterGroup, QueryParams, QueryResult } from './types'
 import { MatchModeProcessor, getObjectProperty, validateBetweenPayload } from './utils'
 
-export function query<T extends GenericObject, P extends QueryParams>(
+export function query<T extends GenericObject, P extends QueryParams<T>>(
   data: T[],
   params: P,
 ): QueryResult<T, P> {
