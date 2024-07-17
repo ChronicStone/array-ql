@@ -1,7 +1,7 @@
 {
   "name": "@chronicstone/array-query",
   "type": "module",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A simple and lightweight array query library",
   "author": "Cyprien THAO <cthao.pro@gmail.com>",
   "license": "MIT",
@@ -52,7 +52,7 @@
     "@antfu/eslint-config": "^2.22.0-beta.2",
     "@antfu/ni": "^0.21.12",
     "@antfu/utils": "^0.7.10",
-    "@chronicstone/array-query": "0.2.0",
+    "@chronicstone/array-query": "0.2.1",
     "@faker-js/faker": "^8.4.1",
     "@shikijs/vitepress-twoslash": "^1.10.3",
     "@types/node": "^20.14.10",
