@@ -73,20 +73,19 @@ export default defineConfig({
           { text: 'lessThan', link: '/filter-match-modes/less-than' },
           { text: 'lessThanOrEqual', link: '/filter-match-modes/less-than-or-equal' },
           { text: 'exists', link: '/filter-match-modes/exists' },
-          { text: 'objectStringMap', link: '/filter-match-modes/object-string-map' },
           { text: 'arrayLength', link: '/filter-match-modes/array-length' },
           { text: 'objectMatch', link: '/filter-match-modes/object-match' },
         ],
       },
-      {
-        text: 'API Reference',
-        items: [
-          { text: 'Query Function', link: '/api-reference/query-function' },
-          { text: 'QueryParams', link: '/api-reference/query-params' },
-          { text: 'QueryFilter', link: '/api-reference/query-filter' },
-          { text: 'FilterMatchMode', link: '/api-reference/filter-match-mode' },
-        ],
-      },
+      // {
+      //   text: 'API Reference',
+      //   items: [
+      //     { text: 'Query Function', link: '/api-reference/query-function' },
+      //     { text: 'QueryParams', link: '/api-reference/query-params' },
+      //     { text: 'QueryFilter', link: '/api-reference/query-filter' },
+      //     { text: 'FilterMatchMode', link: '/api-reference/filter-match-mode' },
+      //   ],
+      // },
     ],
 
   },
