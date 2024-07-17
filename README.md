@@ -20,9 +20,16 @@
 ## INSTALLATION
 
 ```bash
+// npm
 npm install @chronicstone/array-query
+
+// yarn
 yarn add @chronicstone/array-query
+
+// pnpm
 pnpm add @chronicstone/array-query
+
+// bun
 bun add @chronicstone/array-query
 ```
 
