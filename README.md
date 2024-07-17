@@ -1,145 +1,83 @@
-# 🔍 ArrayQuery
+# Array-Query
 
-ArrayQuery is a powerful TypeScript package that brings type-safe querying capabilities to local arrays. It allows you to manipulate and retrieve data from arrays with ease, using a familiar and intuitive API.
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![bundle][bundle-src]][bundle-href]
+[![JSDocs][jsdocs-src]][jsdocs-href]
+[![License][license-src]][license-href]
 
-## ✨ Features
+> ### **Query JavaScript arrays with ORM-like syntax, benefiting from excellent type-safety & developer experience.**
 
-- 📄 **Pagination**: Easily paginate through large datasets
-- 🔎 **Searching**: Perform full-text search across multiple fields
-- 🧭 **Filtering**: Apply complex filters with various match modes
-- 🔢 **Sorting**: Order results based on any field
+## Key Features:
 
-## 📦 Installation
+- 🛠 **Type-safe Querying:** Design your queries with strong typing (typed sort / search / filter keys & output)
+- 📄 **Pagination:** Easily paginate through large datasets with built-in support.
+- 🔎 **Full-text Search:** Perform comprehensive searches across multiple fields in your data.
+- 🧭 **Advanced Filtering:** Apply complex filters with various match modes for precise data retrieval. Supports logical grouping, nested conditions, and array matching.
+- 🔢 **Flexible Sorting:** Order results based on any field, with support for multiple sort criteria.
+- 🚀 **Lightweight and Fast:** Queries stay super fast, even with large datasets.
 
-```bash
-npm install array-query
-```
+## INSTALLATION
 
-## 🚀 Quick Start
+\```bash
+npm install @chronicstone/array-query
+yarn add @chronicstone/array-query
+pnpm add @chronicstone/array-query
+bun add @chronicstone/array-query
+\```
 
-```typescript
-import { query } from 'array-query'
+## USAGE EXAMPLE
+
+\```ts
+import { query } from '@chronicstone/array-query'
 
 const users = [
-  { id: 1, fullName: 'John Doe', email: 'john@example.com', status: 'active', createdAt: '2023-01-01' },
-  { id: 2, fullName: 'Jane Smith', email: 'jane@example.com', status: 'inactive', createdAt: '2023-02-15' },
+  { id: 1, fullName: 'John Doe', email: 'john@example.com', age: 30, status: 'active', roles: ['admin'], createdAt: '2023-01-01' },
+  { id: 2, fullName: 'Jane Smith', email: 'jane@example.com', age: 28, status: 'inactive', roles: ['user'], createdAt: '2023-02-15' },
+  { id: 3, fullName: 'Bob Johnson', email: 'bob@example.com', age: 35, status: 'active', roles: ['user', 'manager'], createdAt: '2023-03-20' },
   // ... more users
 ]
 
-const result = query(users, {
-  limit: 10,
+const { totalRows, totalPages, rows } = query(users, {
+  // Pagination
   page: 1,
+  limit: 10,
+
+  // Sorting
+  sort: [
+    { key: 'age', dir: 'desc' },
+    { key: 'fullName', dir: 'asc' }
+  ],
+
+  // Searching
   search: {
-    value: 'John',
-    keys: ['fullName', 'email'],
+    value: 'john',
+    keys: ['fullName', 'email']
   },
-  sort: {
-    key: 'createdAt',
-    order: 'desc',
-  },
+
+  // Filtering
   filter: [
-    {
-      key: 'status',
-      matchMode: 'equals',
-      value: 'active',
-    },
-  ],
+    { key: 'status', matchMode: 'equals', value: 'active' },
+    { key: 'age', matchMode: 'greaterThan', value: 25 },
+  ]
 })
+\```
 
-console.log(result.data) // Filtered and paginated user data
-console.log(result.totalPages) // Total number of pages
-console.log(result.totalRows) // Total number of matching rows
-```
+This example demonstrates pagination, multi-field sorting, full-text searching, and complex filtering with nested conditions and array field matching.
 
-## 📘 API Reference
+## License
 
-### `query(data: T[], params: QueryParams): QueryResult<T>`
+[MIT](./LICENSE) License © 2023-PRESENT [Cyprien THAO](https://github.com/ChronicStone)
 
-The main function to query your array data.
+<!-- Badges -->
 
-#### QueryParams
-
-- `page: number`: The page number to retrieve
-- `limit: number`: The number of items per page
-- `sort?: { key: string, order?: 'asc' | 'desc' }`: Sorting configuration
-- `search?: { value: string, keys: string[] }`: Search configuration
-- `filter?: QueryFilter[]`: Array of filters to apply
-
-#### QueryFilter
-
-- `key: string`: The property to filter on
-- `value: any`: The value to compare against
-- `matchMode: FilterMatchMode`: The type of comparison to make
-- `operator?: Operator` (`'AND' | 'OR' | (() => 'AND' | 'OR')`): How to combine multiple matches in arrays
-- `params?: MatcherParams`: Additional parameters for the match mode
-
-### FilterMatchMode
-
-- `'contains'`: Check if the value contains the filter value
-- `'between'`: Check if the value is between two values (for numbers or dates)
-- `'equals'`: Exact match
-- `'notEquals'`: Inverse of exact match
-- `'greaterThan'`: Greater than comparison
-- `'greaterThanOrEqual'`: Greater than or equal comparison
-- `'lessThan'`: Less than comparison
-- `'lessThanOrEqual'`: Less than or equal comparison
-- `'exists'`: Check if the property exists
-- `'objectStringMap'`: Complex object mapping
-- `'arrayLength'`: Check the length of an array
-- `'objectMatch'`: Complex object matching
-
-## 🌟 Advanced Usage
-
-### Complex Filtering
-
-```typescript
-const result = query(users, {
-  filter: [
-    {
-      key: 'account.type',
-      matchMode: 'equals',
-      value: ['admin', 'manager'],
-    },
-    {
-      key: 'lastLogin',
-      matchMode: 'greaterThan',
-      value: '2023-01-01',
-      params: { dateMode: true },
-    },
-    {
-      key: 'tags',
-      matchMode: 'arrayLength',
-      value: 3,
-    },
-  ],
-})
-```
-
-### Object Map Filtering
-
-```typescript
-const result = query(users, {
-  filter: [
-    {
-      key: 'account',
-      matchMode: 'objectMatch',
-      params: {
-        properties: [{ key: 'type', matchMode: 'equals' }, { key: 'id', matchMode: 'equals' }],
-        operator: 'AND',
-      },
-      value: {
-        type: 'admin',
-        id: 1,
-      },
-    },
-  ],
-})
-```
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/yourusername/array-query/issues).
-
-## 📄 License
-
-This project is [MIT](https://opensource.org/licenses/MIT) licensed.
+[npm-version-src]: https://img.shields.io/npm/v/@chronicstone/array-query?style=flat&colorA=080f12&colorB=1fa669
+[npm-version-href]: https://npmjs.com/package/@chronicstone/array-query
+[npm-downloads-src]: https://img.shields.io/npm/dm/@chronicstone/array-query?style=flat&colorA=080f12&colorB=1fa669
+[npm-downloads-href]: https://npmjs.com/package/@chronicstone/array-query
+[bundle-src]: https://img.shields.io/bundlephobia/minzip/@chronicstone/array-query?style=flat&colorA=080f12&colorB=1fa669&label=minzip
+[bundle-href]: https://bundlephobia.com/result?p=@chronicstone/array-query
+[license-src]: https://img.shields.io/github/license/ChronicStone/array-query.svg?style=flat&colorA=080f12&colorB=1fa669
+[license-href]: https://github.com/ChronicStone/array-query/blob/main/LICENSE
+[jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
+[jsdocs-href]: https://www.jsdocs.io/package/@chronicstone/array-query
