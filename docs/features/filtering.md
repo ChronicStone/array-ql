@@ -174,4 +174,5 @@ ArrayQuery supports various match modes for different types of comparisons. Each
 - 'lessThanOrEqual'
 - 'exists'
 - 'arrayLength'
+- 'regex'
 - 'objectMatch'

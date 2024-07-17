@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { describe, expect, it } from 'vitest'
 import { query } from '../src'
 import PaginationFixtures from './fixtures/pagination.fixture.json'
@@ -29,6 +30,8 @@ for (const fixture of fixtures) {
     for (const test of fixture.tests) {
       it(test.title, () => {
         const { unpaginatedRows, ...result } = (query as any)(test.data, test.query)
+        console.log('expected', test.result)
+        console.log('actual', result)
         expect(result).toEqual(test.result)
       })
     }
@@ -55,7 +58,6 @@ describe('performance check', () => {
     })
 
     const end = performance.now()
-    // eslint-disable-next-line no-console
     console.info('Time taken:', end - start)
     expect(end - start).toBeLessThan(500)
   })

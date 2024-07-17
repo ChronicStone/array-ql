@@ -137,6 +137,16 @@ export function query<T extends GenericObject, P extends QueryParams<T>>(
             })
           }
 
+          if (filter.matchMode === 'regex') {
+            return processFilterWithLookup({
+              type: 'regex',
+              params: filter?.params ?? null,
+              operator,
+              value,
+              filter: filter.value,
+            })
+          }
+
           if (filter.matchMode === 'objectMatch') {
             const params = typeof filter.params === 'function' ? filter.params(filter.value) : filter.params
             const filterValue = params?.transformFilterValue?.(filter.value) ?? filter.value

@@ -37,16 +37,20 @@ export type FilterMatchMode =
   | 'lessThan'
   | 'lessThanOrEqual'
   | 'exists'
+  | 'regex'
   | 'arrayLength'
   | 'objectMatch'
 
 export type NonObjectMatchMode = Exclude<FilterMatchMode, 'objectMatch'>
 export type ComparatorMatchMode = Extract<FilterMatchMode, 'between' | 'greaterThan' | 'greaterThanOrEqual' | 'lessThan' | 'lessThanOrEqual'>
-
+export type RegexMatchMode = Extract<FilterMatchMode, 'regex'>
 export interface ComparatorParams {
   dateMode?: boolean
 }
 
+export interface RegexParams {
+  flags?: string
+}
 export interface ObjectMapFilterParams {
   operator: 'AND' | 'OR'
   properties: Array<{
@@ -59,10 +63,13 @@ export interface ObjectMapFilterParams {
 }
 
 export type MatchModeCore = ({
-  matchMode: Exclude<FilterMatchMode, 'objectStringMap' | 'objectMatch' | ComparatorMatchMode>
+  matchMode: Exclude<FilterMatchMode, RegexMatchMode | 'objectMatch' | ComparatorMatchMode>
 } | {
   matchMode: ComparatorMatchMode
   params?: ComparatorParams
+} | {
+  matchMode: 'regex'
+  params?: RegexParams
 } | {
   matchMode: 'objectMatch'
   params: ObjectMapFilterParams | ((value: any) => ObjectMapFilterParams)
@@ -108,15 +115,16 @@ export interface QueryParams<
 export type QueryResult<T extends GenericObject, P extends QueryParams<T>> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : { rows: T[] }
 
 export interface MatchModeProcessorMap {
-  equals: ({ value, filter }: { value: any, filter: any }) => boolean
-  notEquals: ({ value, filter }: { value: any, filter: any }) => boolean
-  exists: ({ value, filter }: { value: any, filter: any }) => boolean
-  contains: ({ value, filter }: { value: any, filter: any }) => boolean
-  greaterThan: ({ value, filter }: { value: any, filter: any, params?: ComparatorParams }) => boolean
-  greaterThanOrEqual: ({ value, filter }: { value: any, filter: any, params?: ComparatorParams }) => boolean
-  lessThan: ({ value, filter }: { value: any, filter: any, params?: ComparatorParams }) => boolean
-  lessThanOrEqual: ({ value, filter }: { value: any, filter: any, params?: ComparatorParams }) => boolean
-  between: ({ value, filter }: { value: any, filter: any, params?: ComparatorParams }) => boolean
-  arrayLength: ({ value, filter }: { value: any, filter: any }) => boolean
-  objectMatch: ({ value, filter, params }: { value: any, filter: any, params: ObjectMapFilterParams, index?: number }) => boolean
+  equals: (f: { value: any, filter: any }) => boolean
+  notEquals: (f: { value: any, filter: any }) => boolean
+  exists: (f: { value: any, filter: any }) => boolean
+  contains: (f: { value: any, filter: any }) => boolean
+  greaterThan: (f: { value: any, filter: any, params?: ComparatorParams }) => boolean
+  greaterThanOrEqual: (f: { value: any, filter: any, params?: ComparatorParams }) => boolean
+  lessThan: (f: { value: any, filter: any, params?: ComparatorParams }) => boolean
+  lessThanOrEqual: (f: { value: any, filter: any, params?: ComparatorParams }) => boolean
+  between: (f: { value: any, filter: any, params?: ComparatorParams }) => boolean
+  arrayLength: (f: { value: any, filter: any }) => boolean
+  objectMatch: (f: { value: any, filter: any, params: ObjectMapFilterParams, index?: number }) => boolean
+  regex: (f: { value: any, filter: any, params?: RegexParams }) => boolean
 }

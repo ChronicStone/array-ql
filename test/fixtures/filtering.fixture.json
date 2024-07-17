@@ -210,6 +210,166 @@
     }
   },
   {
+    "title": "Regex match mode - basic matching",
+    "data": [
+      { "id": 1, "email": "john@example.com" },
+      { "id": 2, "email": "jane@test.com" },
+      { "id": 3, "email": "bob@example.org" }
+    ],
+    "query": {
+      "filter": [
+        { "key": "email", "matchMode": "regex", "value": "@example\\.(com|org)" }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "email": "john@example.com" },
+        { "id": 3, "email": "bob@example.org" }
+      ]
+    }
+  },
+  {
+    "title": "Regex match mode - case insensitive",
+    "data": [
+      { "id": 1, "name": "John Doe" },
+      { "id": 2, "name": "jane smith" },
+      { "id": 3, "name": "Bob Johnson" }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "name",
+          "matchMode": "regex",
+          "value": "^j.*",
+          "params": { "flags": "i" }
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe" },
+        { "id": 2, "name": "jane smith" }
+      ]
+    }
+  },
+  {
+    "title": "Regex match mode - case sensitive",
+    "data": [
+      { "id": 1, "name": "John Doe" },
+      { "id": 2, "name": "jane smith" },
+      { "id": 3, "name": "Bob Johnson" }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "name",
+          "matchMode": "regex",
+          "value": "^j.*"
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 2, "name": "jane smith" }
+      ]
+    }
+  },
+  {
+    "title": "Regex match mode - global flag",
+    "data": [
+      { "id": 1, "text": "The quick brown fox" },
+      { "id": 2, "text": "The lazy dog" },
+      { "id": 3, "text": "Quick foxes are quick" }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "text",
+          "matchMode": "regex",
+          "value": "quick",
+          "params": { "flags": "g" }
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "text": "The quick brown fox" },
+        { "id": 3, "text": "Quick foxes are quick" }
+      ]
+    }
+  },
+  {
+    "title": "Regex match mode - multiline flag",
+    "data": [
+      { "id": 1, "description": "First line\nSecond line" },
+      { "id": 2, "description": "One line only" },
+      { "id": 3, "description": "First line\nLast line" }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "description",
+          "matchMode": "regex",
+          "value": "^Last",
+          "params": { "flags": "m" }
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 3, "description": "First line\nLast line" }
+      ]
+    }
+  },
+  {
+    "title": "Regex match mode - combined flags",
+    "data": [
+      { "id": 1, "content": "HELLO\nWorld" },
+      { "id": 2, "content": "hello\nWORLD" },
+      { "id": 3, "content": "Hi\nthere" }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "content",
+          "matchMode": "regex",
+          "value": "^world",
+          "params": { "flags": "im" }
+        }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "content": "HELLO\nWorld" },
+        { "id": 2, "content": "hello\nWORLD" }
+      ]
+    }
+  },
+  {
+    "title": "Regex match mode - with other filters",
+    "data": [
+      { "id": 1, "name": "John Doe", "age": 30 },
+      { "id": 2, "name": "Jane Smith", "age": 25 },
+      { "id": 3, "name": "Bob Johnson", "age": 35 }
+    ],
+    "query": {
+      "filter": [
+        {
+          "key": "name",
+          "matchMode": "regex",
+          "value": "^j.*",
+          "params": { "flags": "i" }
+        },
+        { "key": "age", "matchMode": "greaterThan", "value": 28 }
+      ]
+    },
+    "result": {
+      "rows": [
+        { "id": 1, "name": "John Doe", "age": 30 }
+      ]
+    }
+  },
+  {
     "title": "Object Match mode",
     "data": [
       { "id": 1, "name": "John", "account": { "type": "premium", "status": "active" } },
