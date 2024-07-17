@@ -15,73 +15,48 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
 
-      - name: Set node
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: Setup
-        run: npm i -g @antfu/ni
-
-      - name: Install
-        run: nci
+      - name: Install dependencies
+        run: bun install
 
       - name: Lint
-        run: nr lint
+        run: bun run lint
 
   typecheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
 
-      - name: Set node
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: Setup
-        run: npm i -g @antfu/ni
-
-      - name: Install
-        run: nci
+      - name: Install dependencies
+        run: bun install
 
       - name: Typecheck
-        run: nr typecheck
+        run: bun run typecheck
 
   test:
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        node: [lts/*]
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
 
-      - name: Set node ${{ matrix.node }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Setup
-        run: npm i -g @antfu/ni
-
-      - name: Install
-        run: nci
+      - name: Install dependencies
+        run: bun install
 
       - name: Build
-        run: nr build
+        run: bun run build
 
       - name: Test
-        run: nr test
+        run: bun run test
