@@ -205,6 +205,7 @@ This example returns items where at least one order has a total greater than 200
 The `applyAtRoot` option allows you to apply the filter to the root object instead of a nested property:
 
 ```ts twoslash
+// @errors: 2322
 import { query } from '@chronicstone/array-query'
 
 const data = [

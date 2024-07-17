@@ -7,9 +7,9 @@ export type NestedPaths<T> = T extends Array<infer U>
     ? {
         [K in keyof T & (string | number)]: K extends string
           ? `${K}` | `${K}.${NestedPaths<T[K]>}`
-          : string;
+          : never;
       }[keyof T & (string | number)]
-    : string
+    : never
 
 export type NestedPathsForType<T, P> = T extends Array<infer U>
   ? NestedPathsForType<U, P>
@@ -99,7 +99,7 @@ export interface QueryParams<
   PrimitivePath extends string = NestedPathsForType<T, string | number | null | boolean | undefined>,
 > {
   sort?: SortOption<PrimitivePath> | Array<SortOption<PrimitivePath>>
-  search?: SearchOptions<PrimitivePath>
+  search?: SearchOptions<Paths>
   filter?: FilterOptions<Paths>
   limit?: number
   page?: number
