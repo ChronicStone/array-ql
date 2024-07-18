@@ -30,8 +30,8 @@ for (const fixture of fixtures) {
     for (const test of fixture.tests) {
       it(test.title, () => {
         const { unpaginatedRows, ...result } = (query as any)(test.data, test.query)
-        console.log('expected', test.result)
-        console.log('actual', result)
+        console.log('expected', JSON.stringify(test.result, null, 2))
+        console.log('actual', JSON.stringify(result, null, 2))
         expect(result).toEqual(test.result)
       })
     }

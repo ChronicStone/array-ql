@@ -1,169 +1,14 @@
-import type { FilterMatchMode, GenericObject, MatchModeProcessorMap, QueryFilter, QueryFilterGroup, QueryParams, QueryResult } from './types'
-import { MatchModeProcessor, getObjectProperty, validateBetweenPayload } from './utils'
+import type { GenericObject, QueryFilter, QueryFilterGroup, QueryParams, QueryResult } from './types'
+import { getObjectProperty, processFilterWithLookup, processSearchQuery } from './utils'
 
 export function query<T extends GenericObject, P extends QueryParams<T>>(
   data: T[],
   params: P,
 ): QueryResult<T, P> {
-  let result: T[] = [...data]
+  let result = Array.from(lazyQuery(data, params))
 
-  if (params.search && params.search.value) {
-    result = result.filter((item) => {
-      for (const key of params.search?.keys ?? []) {
-        const field = typeof key === 'string' ? key : key.key
-        const caseSensitive = typeof key === 'string' ? (params.search?.caseSensitive ?? false) : key.caseSensitive ?? false
-        if (processSearchQuery({ key: field, caseSensitive, object: item, value: params.search!.value }))
-          return true
-      }
-      return false
-    })
-  }
-
-  if (params.sort) {
-    const sortArray = Array.isArray(params.sort) ? params.sort : [params.sort]
-
-    result = result.sort((a, b) => {
-      for (const { key, dir, parser } of sortArray) {
-        const parserHandler = typeof parser === 'function' ? parser : (v: any) => parser === 'number' ? Number(v) : parser === 'boolean' ? Boolean(v) : parser === 'string' ? String(v) : v
-        const aParsed = parserHandler(getObjectProperty(a, key)) ?? null
-        const bParsed = parserHandler(getObjectProperty(b, key)) ?? null
-
-        if (aParsed !== bParsed) {
-          const comparison = (aParsed < bParsed) ? -1 : 1
-          return dir === 'asc' ? comparison : -comparison
-        }
-      }
-      return 0
-    })
-  }
-
-  if (Array.isArray(params.filter) && params.filter.length) {
-    result = result.filter((item) => {
-      const IS_GROUP = params.filter?.every(filter => 'filters' in filter) ?? false
-      const METHOD = IS_GROUP ? 'some' : 'every' as const
-      const FILTERS = (params?.filter ?? []) as any[]
-      return FILTERS[METHOD]((group: QueryFilter | QueryFilterGroup) => {
-        const filters = 'filters' in group ? group.filters : [group]
-        const op = 'filters' in group ? group.operator : 'OR'
-        return filters[op === 'AND' ? 'every' : 'some' as const]((filter) => {
-          const value = getObjectProperty(item, filter.key)
-          const operator = typeof filter.operator === 'function' ? filter.operator() : filter.operator ?? 'OR'
-          if (filter.matchMode === 'equals') {
-            return processFilterWithLookup({
-              type: 'equals',
-              params: null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-
-          if (filter.matchMode === 'contains') {
-            return processFilterWithLookup({
-              type: 'contains',
-              params: null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-          if (filter.matchMode === 'between') {
-            return processFilterWithLookup({
-              type: 'between',
-              params: filter?.params ?? null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-
-          if (filter.matchMode === 'greaterThan') {
-            return processFilterWithLookup({
-              type: 'greaterThan',
-              params: filter?.params ?? null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-
-          if (filter.matchMode === 'greaterThanOrEqual') {
-            return processFilterWithLookup({
-              type: 'greaterThanOrEqual',
-              params: filter?.params ?? null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-
-          if (filter.matchMode === 'lessThan') {
-            return processFilterWithLookup({
-              type: 'lessThan',
-              params: filter?.params ?? null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-
-          if (filter.matchMode === 'lessThanOrEqual') {
-            return processFilterWithLookup({
-              type: 'lessThanOrEqual',
-              params: filter?.params ?? null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-
-          if (filter.matchMode === 'exists') {
-            return processFilterWithLookup({
-              type: 'exists',
-              params: null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-
-          if (filter.matchMode === 'arrayLength') {
-            return processFilterWithLookup({
-              type: 'arrayLength',
-              params: null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-
-          if (filter.matchMode === 'regex') {
-            return processFilterWithLookup({
-              type: 'regex',
-              params: filter?.params ?? null,
-              operator,
-              value,
-              filter: filter.value,
-            })
-          }
-
-          if (filter.matchMode === 'objectMatch') {
-            const params = typeof filter.params === 'function' ? filter.params(filter.value) : filter.params
-            const filterValue = params?.transformFilterValue?.(filter.value) ?? filter.value
-            return processFilterWithLookup({
-              type: 'objectMatch',
-              params,
-              operator,
-              value: params?.applyAtRoot ? item : value,
-              filter: filterValue,
-            })
-          }
-
-          return false
-        })
-      })
-    })
-  }
+  if (params.sort)
+    result = sortedQuery(result, params.sort)
 
   if (typeof params.limit === 'undefined') {
     return { rows: result } as QueryResult<T, P>
@@ -186,88 +31,68 @@ export function query<T extends GenericObject, P extends QueryParams<T>>(
   }
 }
 
-function parseSearchValue(value: any, caseSensitive: boolean): string {
-  return (caseSensitive ? value?.toString() : value?.toString()?.toLowerCase?.()) ?? ''
+function* lazyQuery<T extends GenericObject>(data: T[], params: QueryParams<T>): Generator<T> {
+  for (const item of data) {
+    if (matchesSearchAndFilters(item, params)) {
+      yield item
+    }
+  }
 }
 
-function processSearchQuery(params: { key: string, object: Record<string, any>, value: string, caseSensitive: boolean }): boolean {
-  const { key, object, value, caseSensitive } = params
-  const keys = key.split('.')
-
-  let current: any = object
-  for (let i = 0; i < keys.length; i++) {
-    if (Array.isArray(current))
-      return current.some(item => processSearchQuery({ key: keys.slice(i).join('.'), object: item, value, caseSensitive }))
-
-    else if (current && Object.prototype.hasOwnProperty.call(current, keys[i]))
-      current = current[keys[i]]
-
-    else
-      return false
-  }
-
-  if (Array.isArray(current))
-    return current.some(element => parseSearchValue(element, caseSensitive).includes(parseSearchValue(value, caseSensitive)))
-
-  else
-    return parseSearchValue(current, caseSensitive).includes(parseSearchValue(value, caseSensitive)) ?? false
+function matchesSearchAndFilters<T extends GenericObject>(item: T, params: QueryParams<T>): boolean {
+  return matchesSearch(item, params.search) && matchesFilters(item, params.filter)
 }
 
-function processFilterWithLookup<
-  T extends FilterMatchMode,
-  P = Parameters<MatchModeProcessorMap[T]>[0],
->(params: {
-  type: FilterMatchMode
-  operator: 'AND' | 'OR'
-  value: any
-  filter: any
-  params: P extends { params: infer U } ? U : P extends { params?: infer U } ? U : null
-  lookupFrom?: 'value' | 'filter'
-}) {
-  if (!Array.isArray(params.filter) || (params.type === 'between' && validateBetweenPayload(params.filter))) {
-    return Array.isArray(params.value)
-      ? params.value.some(value =>
-        MatchModeProcessor[params.type]({
-          params: params.params as any,
-          value,
-          filter: params.filter,
-        }),
-      )
-      : MatchModeProcessor[params.type]({ params: params.params as any, value: params.value, filter: params.filter })
-  }
+function matchesSearch<T extends GenericObject>(item: T, search?: QueryParams<T>['search']): boolean {
+  if (!search || !search.value)
+    return true
 
-  else if (params.operator === 'AND') {
-    return Array.isArray(params.filter) && params.filter.every((filter, index) => {
-      if (Array.isArray(params.value)) {
-        return params.value.some(value =>
-          MatchModeProcessor[params.type]({
-            params: params.params as any,
-            value,
-            filter,
-            index,
-          }),
-        )
-      }
-      else {
-        return MatchModeProcessor[params.type]({ params: params.params as any, value: params.value, filter, index })
-      }
+  return search.keys.some((key) => {
+    const field = typeof key === 'string' ? key : key.key
+    const caseSensitive = typeof key === 'string' ? (search.caseSensitive ?? false) : key.caseSensitive ?? false
+    return processSearchQuery({ key: field, caseSensitive, object: item, value: search.value })
+  })
+}
+
+function matchesFilters<T extends GenericObject>(item: T, filters?: (QueryFilter | QueryFilterGroup)[]): boolean {
+  if (!filters || filters.length === 0)
+    return true
+  const isGroup = filters.every(filter => 'filters' in filter)
+  const method = isGroup ? 'some' : 'every'
+  return filters[method]((group: QueryFilter | QueryFilterGroup) => {
+    const groupFilters = 'filters' in group ? group.filters : [group]
+    const op = 'filters' in group ? group.operator : 'OR'
+    return groupFilters[op === 'AND' ? 'every' : 'some']((filter: QueryFilter) => {
+      const value = getObjectProperty(item, filter.key)
+      const operator = typeof filter.operator === 'function' ? filter.operator() : filter.operator ?? 'OR'
+      const params = (!('params' in filter) ? null : typeof filter.params === 'function' ? filter.params(filter.value) : filter.params) ?? null
+      return processFilterWithLookup({
+        type: filter.matchMode,
+        params,
+        operator,
+        value,
+        filter: filter.value,
+      })
     })
-  }
+  })
+}
 
-  else if (params.operator === 'OR') {
-    return Array.isArray(params.filter) && params.filter.some((filter, index) =>
-      Array.isArray(params.value)
-        ? params.value.some(value =>
-          MatchModeProcessor[params.type]({
-            params: params.params as any,
-            value,
-            filter,
-            index,
-          }),
-        )
-        : MatchModeProcessor[params.type]({ params: params.params as any, value: params.value, filter, index }),
-    )
-  }
+function sortedQuery<T extends GenericObject>(data: T[], sortOptions?: QueryParams<T>['sort']): T[] {
+  if (!sortOptions)
+    return data
 
-  return false
+  const sortArray = Array.isArray(sortOptions) ? sortOptions : [sortOptions]
+  return data.slice().sort((a, b) => {
+    for (const { key, dir, parser } of sortArray) {
+      const parserHandler = typeof parser === 'function' ? parser : (v: any) => parser === 'number' ? Number(v) : parser === 'boolean' ? Boolean(v) : parser === 'string' ? String(v) : v
+      const aParsed = parserHandler(getObjectProperty(a, key)) ?? null
+      const bParsed = parserHandler(getObjectProperty(b, key)) ?? null
+
+      if (aParsed !== bParsed) {
+        const comparison = (aParsed < bParsed) ? -1 : 1
+        return dir === 'asc' ? comparison : -comparison
+      }
+    }
+    return 0
+  })
 }
