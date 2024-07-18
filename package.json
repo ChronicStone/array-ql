@@ -1,7 +1,7 @@
 {
   "name": "@chronicstone/array-query",
   "type": "module",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A simple and lightweight array query library",
   "author": "Cyprien THAO <cthao.pro@gmail.com>",
   "license": "MIT",
