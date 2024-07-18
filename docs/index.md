@@ -17,7 +17,7 @@ hero:
       link: /getting-started/introduction
     - theme: alt
       text: View on GitHub
-      link: https://github.com/yourusername/array-query
+      link: https://github.com/ChronicStone/array-ql
 
 features:
   - title: Powerful Pagination

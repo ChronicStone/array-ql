@@ -16,6 +16,7 @@
 - 🧭 **Advanced Filtering:** Apply complex filters with various match modes for precise data retrieval. Supports logical grouping, nested conditions, and array matching.
 - 🔢 **Flexible Sorting:** Order results based on any field, with support for multiple sort criteria.
 - 🚀 **Lightweight and Fast:** Queries stay super fast, even with large datasets.
+- 🧩 **Zero Dependencies**: Completely self-contained with no external dependencies, ensuring a small bundle cost
 
 ## INSTALLATION
 
