@@ -10,25 +10,7 @@ export function query<T extends GenericObject, P extends QueryParams<T>>(
   if (params.sort)
     result = sortedQuery(result, params.sort)
 
-  if (typeof params.limit === 'undefined') {
-    return { rows: result } as QueryResult<T, P>
-  }
-
-  else {
-    const unpaginatedRows = [...result]
-    const totalRows = result.length
-    const totalPages = Math.ceil(totalRows / params.limit)
-    const start = ((params?.page ?? 1) - 1) * params.limit
-    const end = start + params.limit
-    result = result.slice(start, end)
-
-    return {
-      totalRows,
-      totalPages,
-      rows: result,
-      unpaginatedRows,
-    } as QueryResult<T, P>
-  }
+  return paginateQuery(result, params)
 }
 
 function* lazyQuery<T extends GenericObject>(data: T[], params: QueryParams<T>): Generator<T> {
@@ -95,4 +77,26 @@ function sortedQuery<T extends GenericObject>(data: T[], sortOptions?: QueryPara
     }
     return 0
   })
+}
+
+function paginateQuery<T extends GenericObject, P extends QueryParams<T>>(data: T[], params: P): QueryResult<T, P> {
+  if (typeof params.limit === 'undefined') {
+    return { rows: data } as QueryResult<T, P>
+  }
+
+  else {
+    const unpaginatedRows = [...data]
+    const totalRows = data.length
+    const totalPages = Math.ceil(totalRows / params.limit)
+    const start = ((params?.page ?? 1) - 1) * params.limit
+    const end = start + params.limit
+    data = data.slice(start, end)
+
+    return {
+      totalRows,
+      totalPages,
+      rows: data,
+      unpaginatedRows,
+    } as QueryResult<T, P>
+  }
 }
