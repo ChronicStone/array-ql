@@ -7,7 +7,7 @@ export function query<T extends GenericObject, P extends QueryParams<T>>(
 ): QueryResult<T, P> {
   let result = lazyQuery(data, params)
   result = lazySortedQuery(result, params.sort)
-  return paginateQuery(Array.from(result), params)
+  return paginateQuery(result, params)
 }
 
 function* lazyQuery<T extends GenericObject>(data: T[], params: QueryParams<T>): Generator<T> {
@@ -111,24 +111,26 @@ function* lazySortedQuery<T extends GenericObject>(
   }
 }
 
-function paginateQuery<T extends GenericObject, P extends QueryParams<T>>(data: T[], params: P): QueryResult<T, P> {
+function paginateQuery<T extends GenericObject, P extends QueryParams<T>>(data: Iterable<T>, params: P): QueryResult<T, P> {
   if (typeof params.limit === 'undefined') {
-    return { rows: data } as QueryResult<T, P>
+    return { rows: Array.from(data) } as QueryResult<T, P>
   }
 
   else {
-    const unpaginatedRows = [...data]
-    const totalRows = data.length
+    let rows = Array.from(data)
+    const totalRows = rows.length
     const totalPages = Math.ceil(totalRows / params.limit)
     const start = ((params?.page ?? 1) - 1) * params.limit
     const end = start + params.limit
-    data = data.slice(start, end)
+    rows = rows.slice(start, end)
 
     return {
       totalRows,
       totalPages,
-      rows: data,
-      unpaginatedRows,
+      rows,
+      get unpaginatedRows() {
+        return Array.from(data)
+      },
     } as QueryResult<T, P>
   }
 }
