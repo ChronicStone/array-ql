@@ -41,15 +41,22 @@ for (const fixture of fixtures) {
 describe('performance check', () => {
   // VAL BETWEEN 1 & 100
   const getValue = () => Math.floor(Math.random() * 100)
-  const items = Array.from({ length: 1000000 }, (_, i) => ({ id: i, name: `Item ${i}`, value: getValue(), other: [], address: { city: 'New York', country: 'USA' } }))
+  const items = Array.from({ length: 1000000 }, (_, i) => ({
+    id: i,
+    name: `Item ${i}`,
+    value: getValue(),
+    other: [],
+    address: { city: 'New York', country: 'USA' },
+    age: Math.floor(Math.random() * 100),
+  }))
   it('query 1M rows - paginate + sort + search + filter in less than 500ms', () => {
     const start = performance.now()
     query(items, {
-      limit: 10,
-      sort: {
-        key: 'address.country',
-        dir: 'asc',
-      },
+      limit: 100,
+      sort: [
+        { key: 'age', dir: 'asc' },
+        { key: 'name', dir: 'asc' },
+      ],
       search: {
         value: 'Item 1',
         keys: ['name'],

@@ -5,12 +5,12 @@ export function query<T extends GenericObject, P extends QueryParams<T>>(
   data: T[],
   params: P,
 ): QueryResult<T, P> {
-  let result = Array.from(lazyQuery(data, params))
+  let result: Iterable<T> = lazyQuery(data, params)
 
   if (params.sort)
-    result = sortedQuery(result, params.sort)
+    result = lazySortedQuery(result, params.sort)
 
-  return paginateQuery(result, params)
+  return paginateQuery(Array.from(result), params)
 }
 
 function* lazyQuery<T extends GenericObject>(data: T[], params: QueryParams<T>): Generator<T> {
@@ -59,24 +59,59 @@ function matchesFilters<T extends GenericObject>(item: T, filters?: (QueryFilter
   })
 }
 
-function sortedQuery<T extends GenericObject>(data: T[], sortOptions?: QueryParams<T>['sort']): T[] {
-  if (!sortOptions)
-    return data
+function* lazySortedQuery<T extends GenericObject>(
+  data: Iterable<T>,
+  sortOptions?: QueryParams<T>['sort'],
+): Generator<T, void, undefined> {
+  if (!sortOptions) {
+    yield * data
+    return
+  }
 
   const sortArray = Array.isArray(sortOptions) ? sortOptions : [sortOptions]
-  return data.slice().sort((a, b) => {
+  const buffer: T[] = []
+  const compare = (a: T, b: T) => {
     for (const { key, dir, parser } of sortArray) {
-      const parserHandler = typeof parser === 'function' ? parser : (v: any) => parser === 'number' ? Number(v) : parser === 'boolean' ? Boolean(v) : parser === 'string' ? String(v) : v
+      const parserHandler = typeof parser === 'function'
+        ? parser
+        : (v: any) =>
+            parser === 'number'
+              ? Number(v)
+              : parser === 'boolean'
+                ? Boolean(v)
+                : parser === 'string' ? String(v) : v
       const aParsed = parserHandler(getObjectProperty(a, key)) ?? null
       const bParsed = parserHandler(getObjectProperty(b, key)) ?? null
-
       if (aParsed !== bParsed) {
         const comparison = (aParsed < bParsed) ? -1 : 1
         return dir === 'asc' ? comparison : -comparison
       }
     }
     return 0
-  })
+  }
+
+  for (const item of data) {
+    buffer.push(item)
+    if (buffer.length >= 1000)
+      break
+  }
+
+  buffer.sort(compare)
+
+  while (buffer.length > 0) {
+    yield buffer[0]
+    buffer.shift()
+
+    for (const item of data) {
+      let insertIndex = buffer.findIndex(bufferItem => compare(item, bufferItem) < 0)
+      if (insertIndex === -1) {
+        insertIndex = buffer.length
+      }
+      buffer.splice(insertIndex, 0, item)
+      if (buffer.length >= 1000)
+        break
+    }
+  }
 }
 
 function paginateQuery<T extends GenericObject, P extends QueryParams<T>>(data: T[], params: P): QueryResult<T, P> {
