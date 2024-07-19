@@ -41,6 +41,7 @@ for (const fixture of fixtures) {
 describe('performance check', () => {
   // VAL BETWEEN 1 & 100
   const getValue = () => Math.floor(Math.random() * 100)
+  const startItems = performance.now()
   const items = Array.from({ length: 1000000 }, (_, i) => ({
     id: i,
     name: `Item ${i}`,
@@ -49,7 +50,9 @@ describe('performance check', () => {
     address: { city: 'New York', country: 'USA' },
     age: Math.floor(Math.random() * 100),
   }))
-  it('query 1M rows - paginate + sort + search + filter in less than 500ms', () => {
+  const endItems = performance.now()
+  it('query 1M rows - paginate + sort + search + filter in less than 30ms', () => {
+    console.info('Time taken to generate 1M items:', endItems - startItems)
     const start = performance.now()
     query(items, {
       limit: 100,
@@ -65,7 +68,7 @@ describe('performance check', () => {
     })
 
     const end = performance.now()
-    console.info('Time taken:', end - start)
-    expect(end - start).toBeLessThan(500)
+    console.info('Time taken to query 1M items:', end - start)
+    expect(end - start).toBeLessThan(30)
   })
 })

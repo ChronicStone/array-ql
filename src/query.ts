@@ -5,11 +5,8 @@ export function query<T extends GenericObject, P extends QueryParams<T>>(
   data: T[],
   params: P,
 ): QueryResult<T, P> {
-  let result: Iterable<T> = lazyQuery(data, params)
-
-  if (params.sort)
-    result = lazySortedQuery(result, params.sort)
-
+  let result = lazyQuery(data, params)
+  result = lazySortedQuery(result, params.sort)
   return paginateQuery(Array.from(result), params)
 }
 
