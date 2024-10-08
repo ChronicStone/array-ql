@@ -88,7 +88,10 @@ export interface QueryFilterGroup<Paths extends string = string> {
   condition?: () => boolean
 }
 
-export type FilterOptions<Paths extends string = string> = Array<QueryFilterGroup<Paths>> | Array<QueryFilter<Paths>>
+export type FilterOptions<Paths extends string = string> = Array<QueryFilterGroup<Paths>> | Array<QueryFilter<Paths>> | {
+  groups: Array<QueryFilterGroup<Paths>>
+  operator: Operator
+}
 
 export interface SearchOptions<Paths extends string = string> {
   value: string
@@ -114,7 +117,7 @@ export interface QueryParams<
   page?: number
 }
 
-export type QueryResult<T extends GenericObject, P extends QueryParams<T>> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : { rows: T[] }
+export type QueryResult<T extends GenericObject, P extends QueryParams<T>> = P extends { limit: number } ? { totalRows: number, totalPages: number, rows: T[], unpaginatedRows: T[] } : T[]
 
 export interface MatchModeProcessorMap {
   equals: (f: { value: any, filter: any }) => boolean

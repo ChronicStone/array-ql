@@ -1,5 +1,5 @@
-import type { GenericObject, QueryFilter, QueryFilterGroup, QueryParams, QueryResult } from './types'
-import { getObjectProperty, processFilterWithLookup, processSearchQuery } from './utils'
+import type { FilterOptions, GenericObject, QueryFilter, QueryFilterGroup, QueryParams, QueryResult } from './types'
+import { getObjectProperty, getOperator, processFilterWithLookup, processSearchQuery } from './utils'
 
 export function query<T extends GenericObject, P extends QueryParams<T>>(
   data: T[],
@@ -33,17 +33,19 @@ function matchesSearch<T extends GenericObject>(item: T, search?: QueryParams<T>
   })
 }
 
-function matchesFilters<T extends GenericObject>(item: T, filters?: (QueryFilter | QueryFilterGroup)[]): boolean {
-  if (!filters || filters.length === 0)
+function matchesFilters<T extends GenericObject>(item: T, filters?: FilterOptions): boolean {
+  const _filters = (typeof filters === 'object' && ('groups' in filters) ? filters.groups : filters) ?? []
+  if (!_filters || _filters.length === 0)
     return true
-  const isGroup = filters.every(filter => 'filters' in filter)
-  const method = isGroup ? 'some' : 'every'
-  return filters.filter(filter => filter.condition?.() ?? true)[method]((group: QueryFilter | QueryFilterGroup) => {
+  const isGroup = _filters.every(filter => 'filters' in filter)
+  const groupOperator = getOperator(typeof filters === 'object' && 'operator' in filters ? filters.operator : 'OR')
+  const method = isGroup ? (groupOperator === 'AND' ? 'every' : 'some') : 'every'
+  return _filters.filter(filter => filter.condition?.() ?? true)[method]((group: QueryFilter | QueryFilterGroup) => {
     const groupFilters = 'filters' in group ? group.filters : [group]
     const op = 'filters' in group ? group.operator : 'OR'
     return groupFilters.filter(filter => filter.condition?.() ?? true)[op === 'AND' ? 'every' : 'some']((filter: QueryFilter) => {
       const value = getObjectProperty(item, filter.key)
-      const operator = typeof filter.operator === 'function' ? filter.operator() : filter.operator ?? 'OR'
+      const operator = getOperator(filter.operator)
       const params = (!('params' in filter) ? null : typeof filter.params === 'function' ? filter.params(filter.value) : filter.params) ?? null
       return processFilterWithLookup({
         type: filter.matchMode,
@@ -113,7 +115,7 @@ function* lazySortedQuery<T extends GenericObject>(
 
 function paginateQuery<T extends GenericObject, P extends QueryParams<T>>(data: Iterable<T>, params: P): QueryResult<T, P> {
   if (typeof params.limit === 'undefined') {
-    return { rows: Array.from(data) } as QueryResult<T, P>
+    return Array.from(data) as QueryResult<T, P>
   }
 
   else {

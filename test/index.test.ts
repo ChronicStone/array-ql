@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { describe, expect, it } from 'vitest'
 import { query } from '../src'
+import { omit } from '../src/utils'
 import PaginationFixtures from './fixtures/pagination.fixture.json'
 import SortingFixtures from './fixtures/sorting.fixture.json'
 import FilteringFixtures from './fixtures/filtering.fixture.json'
@@ -29,10 +30,11 @@ for (const fixture of fixtures) {
   describe(`${fixture.key} tests`, () => {
     for (const test of fixture.tests) {
       it(test.title, () => {
-        const { unpaginatedRows, ...result } = (query as any)(test.data, test.query)
+        const result = (query as any)(test.data, test.query)
+        const matchResult = Array.isArray(result) ? { rows: result } : omit(result, ['unpaginatedRows'])
         console.log('expected', JSON.stringify(test.result, null, 2))
-        console.log('actual', JSON.stringify(result, null, 2))
-        expect(result).toEqual(test.result)
+        console.log('actual', JSON.stringify(matchResult, null, 2))
+        expect(matchResult).toEqual(test.result)
       })
     }
   })

@@ -1,4 +1,4 @@
-import type { FilterMatchMode, GenericObject, MatchModeProcessorMap } from './types'
+import type { FilterMatchMode, GenericObject, MatchModeProcessorMap, Operator } from './types'
 
 export function getObjectProperty(object: Record<string, any>, key: string) {
   return key.split('.').reduce((o, i) => o?.[i], object)
@@ -140,4 +140,14 @@ export function processFilterWithLookup<
   }
 
   return false
+}
+
+export function getOperator(operator?: Operator) {
+  return (typeof operator === 'function' ? operator() : operator) ?? 'OR'
+}
+
+export function omit<T extends object, K extends Array<keyof T>>(object: T, keys: K) {
+  const _result = { ...object }
+  for (const key of keys) delete _result[key]
+  return _result as Omit<T, K[number]>
 }
