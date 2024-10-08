@@ -38,10 +38,10 @@ function matchesFilters<T extends GenericObject>(item: T, filters?: (QueryFilter
     return true
   const isGroup = filters.every(filter => 'filters' in filter)
   const method = isGroup ? 'some' : 'every'
-  return filters[method]((group: QueryFilter | QueryFilterGroup) => {
+  return filters.filter(filter => filter.condition?.() ?? true)[method]((group: QueryFilter | QueryFilterGroup) => {
     const groupFilters = 'filters' in group ? group.filters : [group]
     const op = 'filters' in group ? group.operator : 'OR'
-    return groupFilters[op === 'AND' ? 'every' : 'some']((filter: QueryFilter) => {
+    return groupFilters.filter(filter => filter.condition?.() ?? true)[op === 'AND' ? 'every' : 'some']((filter: QueryFilter) => {
       const value = getObjectProperty(item, filter.key)
       const operator = typeof filter.operator === 'function' ? filter.operator() : filter.operator ?? 'OR'
       const params = (!('params' in filter) ? null : typeof filter.params === 'function' ? filter.params(filter.value) : filter.params) ?? null

@@ -79,11 +79,13 @@ export type QueryFilter<Paths extends string = string> = {
   key: Paths
   value: any
   operator?: Operator
+  condition?: () => boolean
 } & MatchModeCore
 
 export interface QueryFilterGroup<Paths extends string = string> {
   operator: Operator
   filters: QueryFilter<Paths>[]
+  condition?: () => boolean
 }
 
 export type FilterOptions<Paths extends string = string> = Array<QueryFilterGroup<Paths>> | Array<QueryFilter<Paths>>
