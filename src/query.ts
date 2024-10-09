@@ -34,16 +34,21 @@ function matchesSearch<T extends GenericObject>(item: T, search?: QueryParams<T>
 }
 
 function matchesFilters<T extends GenericObject>(item: T, filters?: FilterOptions): boolean {
-  const _filters = (typeof filters === 'object' && ('groups' in filters) ? filters.groups : filters) ?? []
+  const _filters = ((typeof filters === 'object' && ('groups' in filters) ? filters.groups : filters) ?? [])
+    .filter(filter => filter.condition?.() ?? true)
   if (!_filters || _filters.length === 0)
     return true
   const isGroup = _filters.every(filter => 'filters' in filter)
   const groupOperator = getOperator(typeof filters === 'object' && 'operator' in filters ? filters.operator : 'OR')
   const method = isGroup ? (groupOperator === 'AND' ? 'every' : 'some') : 'every'
-  return _filters.filter(filter => filter.condition?.() ?? true)[method]((group: QueryFilter | QueryFilterGroup) => {
-    const groupFilters = 'filters' in group ? group.filters : [group]
+  return _filters[method]((group: QueryFilter | QueryFilterGroup) => {
+    const groupFilters = ('filters' in group ? group.filters : [group])
+      .filter(filter => filter.condition?.() ?? true)
+    if (groupFilters.length === 0)
+      return true
+
     const op = 'filters' in group ? group.operator : 'OR'
-    return groupFilters.filter(filter => filter.condition?.() ?? true)[op === 'AND' ? 'every' : 'some']((filter: QueryFilter) => {
+    return groupFilters[op === 'AND' ? 'every' : 'some']((filter: QueryFilter) => {
       const value = getObjectProperty(item, filter.key)
       const operator = getOperator(filter.operator)
       const params = (!('params' in filter) ? null : typeof filter.params === 'function' ? filter.params(filter.value) : filter.params) ?? null
